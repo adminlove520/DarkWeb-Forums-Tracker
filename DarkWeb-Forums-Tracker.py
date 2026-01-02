@@ -10,6 +10,49 @@ from datetime import datetime
 import dingtalkchatbot.chatbot as cb
 from jinja2 import Template
 
+# 版本信息
+__version__ = "V1.0.3b"
+
+# 从Git仓库动态获取版本信息
+def get_git_version():
+    """
+    从Git仓库获取当前版本信息
+    优先使用Git tag，如果没有tag则使用提交哈希
+    """
+    try:
+        import subprocess
+        
+        # 尝试获取最近的Git tag
+        tag_result = subprocess.run(
+            ["git", "describe", "--tags", "--abbrev=0"],
+            capture_output=True,
+            text=True,
+            check=False
+        )
+        
+        if tag_result.returncode == 0:
+            tag = tag_result.stdout.strip()
+            return tag
+        else:
+            # 如果没有tag，使用提交哈希
+            commit_result = subprocess.run(
+                ["git", "rev-parse", "--short", "HEAD"],
+                capture_output=True,
+                text=True,
+                check=False
+            )
+            
+            if commit_result.returncode == 0:
+                commit_hash = commit_result.stdout.strip()
+                return f"V1.0.3b-{commit_hash}"
+            else:
+                # 如果无法获取Git信息，使用默认版本
+                return __version__
+    except Exception as e:
+        # 任何异常都返回默认版本
+        print(f"获取Git版本信息失败: {str(e)}")
+        return __version__
+
 # 加载配置文件
 def load_config():
     # 从文件加载配置
@@ -302,7 +345,7 @@ def get_proxies():
     return proxies if proxies else None
 
 # 推送函数
-def push_message(title, content):
+def push_message(title, content, is_startup=False):
     config = load_config()
     push_config = config.get('push', {})
     
@@ -321,7 +364,7 @@ def push_message(title, content):
     
     # Discard推送
     if 'discard' in push_config and push_config['discard'].get('switch', '') == "ON" and push_config['discard'].get('send_normal_msg', '') == "ON":
-        send_discard_msg(push_config['discard'].get('webhook'), title, content)
+        send_discard_msg(push_config['discard'].get('webhook'), title, content, is_startup=is_startup)
 
 # 飞书推送
 def send_feishu_msg(webhook, title, content):
@@ -377,7 +420,7 @@ def send_dingding_msg(webhook, secret_key, title, content):
     dingding(title, content, webhook, secret_key)
 
 # Discard推送
-def send_discard_msg(webhook, title, content, is_daily_report=False, is_weekly_report=False, html_file=None, markdown_content=None):
+def send_discard_msg(webhook, title, content, is_daily_report=False, is_weekly_report=False, html_file=None, markdown_content=None, is_startup=False):
     # 检查是否是占位符
     if not webhook or webhook == "discard的webhook地址":
         print(f"Discard推送跳过：webhook地址未配置")
@@ -396,7 +439,50 @@ def send_discard_msg(webhook, title, content, is_daily_report=False, is_weekly_r
         # 生成随机颜色（0-0xFFFFFF）
         random_color = random.randint(0, 0xFFFFFF)
         
-        if is_weekly_report and html_file:
+        if is_startup:
+            # 动态获取推送渠道
+            config = load_config()
+            push_config = config.get('push', {})
+            enabled_channels = []
+            channel_names = {
+                'dingding': '钉钉',
+                'feishu': '飞书',
+                'tg_bot': 'Telegram Bot',
+                'discard': 'Discard'
+            }
+            
+            for channel, channel_config in push_config.items():
+                if channel_config.get('switch', '') == 'ON':
+                    enabled_channels.append(channel_names.get(channel, channel))
+            
+            # 动态获取运行模式
+            import sys
+            run_mode = '单次执行' if '--once' in sys.argv else '循环执行'
+            
+            # 启动卡片，使用绿色主题
+            embed = {
+                "title": title,
+                "color": 0x57F287,  # 绿色
+                "description": f"{content}",
+                "fields": [
+                    {"name": "启动时间", "value": time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), "inline": True},
+                    {"name": "服务状态", "value": "✅ 已启动", "inline": True},
+                    {"name": "版本信息", "value": get_git_version(), "inline": True},
+                    {"name": "监控类型", "value": "DarkWeb论坛数据泄露", "inline": True},
+                    {"name": "推送渠道", "value": ", ".join(enabled_channels) if enabled_channels else "无", "inline": True},
+                    {"name": "运行模式", "value": run_mode, "inline": True}
+                ],
+                "footer": {
+                    "text": "Power By 东方隐侠安全团队·Anonymous@ 隐侠安全客栈",
+                    "icon_url": "https://www.dfyxsec.com/favicon.ico"
+                },
+                "timestamp": datetime.utcnow().isoformat() + "Z"  # ISO 8601格式
+            }
+            
+            data = {
+                "embeds": [embed]
+            }
+        elif is_weekly_report and html_file:
             # 推送周报，使用Embed卡片
             # 生成GitHub Pages URL
             github_pages_url = f"https://adminlove520.github.io/DarkWeb-Forums-Tracker/{html_file}"
@@ -488,36 +574,78 @@ def send_discard_msg(webhook, title, content, is_daily_report=False, is_weekly_r
         if proxies:
             print(f"使用代理：{proxies}")
         
-        # 使用较短的超时时间，避免长时间阻塞
-        response = requests.post(webhook, json=data, headers=headers, timeout=5, proxies=proxies)
+        # 设置重试参数，符合Discord API官方最佳实践
+        max_retries = 5  # 增加重试次数，提高成功率
+        base_delay = 1.0  # 基础延迟时间（秒）
+        max_delay = 60.0  # 最大延迟时间，防止无限等待
         
-        print(f"Discard推送响应状态码：{response.status_code}")
-        
-        # 检查响应状态
-        if response.status_code in [200, 204]:
-            print(f"Discard推送成功: {title}")
+        for attempt in range(max_retries):
+            try:
+                # 使用较短的超时时间，避免长时间阻塞
+                response = requests.post(webhook, json=data, headers=headers, timeout=10, proxies=proxies)
+                
+                print(f"Discard推送响应状态码：{response.status_code}")
+                
+                # 检查响应状态
+                if response.status_code in [200, 204]:
+                    print(f"Discard推送成功: {title}")
+                    break
+                elif response.status_code == 429:
+                    # 处理速率限制，严格遵循Discord API返回的Retry-After头
+                    # Retry-After头可能返回秒或毫秒，需要根据实际情况处理
+                    retry_after_header = response.headers.get('Retry-After')
+                    
+                    if retry_after_header:
+                        try:
+                            retry_after = float(retry_after_header)
+                            # 检查Retry-After是否为毫秒（如果值很大，可能是毫秒）
+                            if retry_after > 1000:  # 如果大于1000，可能是毫秒
+                                retry_after = retry_after / 1000  # 转换为秒
+                        except ValueError:
+                            retry_after = base_delay * (2 ** attempt) + random.uniform(0, 1)  # 添加随机抖动
+                    else:
+                        # 使用指数退避 + 随机抖动，避免请求风暴
+                        retry_after = base_delay * (2 ** attempt) + random.uniform(0, 1)
+                    
+                    # 确保重试延迟不超过最大值
+                    retry_after = min(retry_after, max_delay)
+                    
+                    print(f"Discard推送速率限制，将在{retry_after:.2f}秒后重试 (尝试 {attempt+1}/{max_retries})")
+                    print(f"响应内容: {response.text}")
+                    
+                    # 等待后继续重试
+                    time.sleep(retry_after)
+                    continue
+                else:
+                    print(f"Discard推送失败: HTTP状态码 - {response.status_code}")
+                    print(f"响应内容: {response.text}")
+                    
+                    # 提供解决方案建议
+                    if response.status_code == 401:
+                        print("建议：请检查webhook地址是否正确，可能包含无效的token")
+                    elif response.status_code == 404:
+                        print("建议：webhook地址不存在，请检查webhook地址是否正确")
+                    elif response.status_code >= 500:
+                        print("建议：Discord服务器错误，请稍后再试")
+                    break
+            except requests.exceptions.Timeout:
+                # 超时异常，使用指数退避 + 随机抖动
+                retry_after = base_delay * (2 ** attempt) + random.uniform(0, 1)
+                retry_after = min(retry_after, max_delay)
+                print(f"Discard推送超时，将在{retry_after:.2f}秒后重试 (尝试 {attempt+1}/{max_retries})")
+                time.sleep(retry_after)
+            except requests.exceptions.ConnectionError:
+                # 连接错误，使用指数退避 + 随机抖动
+                retry_after = base_delay * (2 ** attempt) + random.uniform(0, 1)
+                retry_after = min(retry_after, max_delay)
+                print(f"Discard推送连接错误，将在{retry_after:.2f}秒后重试 (尝试 {attempt+1}/{max_retries})")
+                time.sleep(retry_after)
+            except requests.exceptions.RequestException as e:
+                print(f"Discard推送请求异常：{str(e)}")
+                break
         else:
-            print(f"Discard推送失败: HTTP状态码 - {response.status_code}")
-            print(f"响应内容: {response.text}")
-            
-            # 提供解决方案建议
-            if response.status_code == 401:
-                print("建议：请检查webhook地址是否正确，可能包含无效的token")
-            elif response.status_code == 404:
-                print("建议：webhook地址不存在，请检查webhook地址是否正确")
-            elif response.status_code == 429:
-                print("建议：超出Discord API速率限制，请稍后再试")
-            elif response.status_code >= 500:
-                print("建议：Discord服务器错误，请稍后再试")
-    except requests.exceptions.Timeout:
-        print(f"Discard推送失败: 连接超时")
-        print("建议：检查网络连接，或尝试使用更快的网络环境")
-    except requests.exceptions.ConnectionError:
-        print(f"Discard推送失败: 网络连接错误")
-        print("建议：检查网络连接，确保可以访问discord.com")
-        print("可以尝试使用ping命令测试：ping discord.com")
-    except requests.exceptions.RequestException as e:
-        print(f"Discard推送失败: 请求异常 - {str(e)}")
+            # 所有重试都失败
+            print(f"Discard推送失败：已达到最大重试次数 ({max_retries})")
     except Exception as e:
         print(f"Discard推送失败: 未知错误 - {str(e)}")
 
@@ -669,7 +797,7 @@ def generate_daily_report(cursor):
     current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
     
     # 创建目录结构
-    archive_dir = f'archive/Weekly_{start_date}'
+    archive_dir = f'archive/{current_date}'
     os.makedirs(archive_dir, exist_ok=True)
     
     # 从数据库中获取当天的所有数据泄露信息
@@ -1369,7 +1497,7 @@ def main():
                 break
         
         if any_push_enabled:
-            push_message("DarkWeb-Forums-Tracker已启动!", f"启动时间：{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}")
+            push_message("DarkWeb-Forums-Tracker已启动!", f"启动时间：{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}", is_startup=True)
 
     try:
         if args.daily_report:

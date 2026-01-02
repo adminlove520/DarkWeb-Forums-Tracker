@@ -82,7 +82,10 @@ jobs:
           git diff
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
-          git add data_leaks.db archive/ index.html rss/
+          # 添加生成的文件，包括index.html（如果存在）
+          git add data_leaks.db archive/ rss/ || true
+          # 检查index.html是否存在，如果存在则添加
+          if [ -f index.html ]; then git add index.html; fi
           git commit -m "每日DarkWeb论坛数据泄露更新（`date +'%Y-%m-%d'`）" || echo "没有新数据需要提交"
 
       - name: Push changes
