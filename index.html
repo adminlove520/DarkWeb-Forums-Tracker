@@ -13,50 +13,72 @@
         }
         
         :root {
-            --primary-color: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary-color: #8b5cf6;
-            --accent-color: #ec4899;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --text-muted: #9ca3af;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9fafb;
-            --bg-tertiary: #f3f4f6;
-            --border-color: #e5e7eb;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --radius-sm: 6px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --radius-xl: 16px;
-            --transition: all 0.3s ease;
+            /* 终端风格配色 */
+            --bg-primary: #0a0e17;
+            --bg-secondary: #121721;
+            --bg-tertiary: #1a1f2e;
+            --bg-gradient: linear-gradient(135deg, #00ff41, #00e0ff);
+            --primary-color: #00ff41;
+            --primary-dark: #00d437;
+            --secondary-color: #00e0ff;
+            --accent-color: #ff007f;
+            --success-color: #00ff41;
+            --warning-color: #ffff00;
+            --danger-color: #ff007f;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b8c1;
+            --text-muted: #6b7280;
+            --border-color: #2d3748;
+            --border-light: #222936;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 255, 65, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 255, 65, 0.15), 0 2px 4px -1px rgba(0, 255, 65, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 255, 65, 0.2), 0 4px 6px -2px rgba(0, 255, 65, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 255, 65, 0.25), 0 10px 10px -5px rgba(0, 255, 65, 0.15);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 255, 65, 0.3);
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 10px;
+            --radius-2xl: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            line-height: 1.6;
+            font-family: 'Courier New', Courier, 'Consolas', 'Monaco', 'Ubuntu Mono', monospace;
+            line-height: 1.7;
             color: var(--text-primary);
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
             background-color: var(--bg-secondary);
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(100, 106, 245, 0.05) 0%, rgba(100, 106, 245, 0.05) 90%),
-                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 90%);
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 65, 0.05) 0%, rgba(0, 255, 65, 0.05) 90%),
+                radial-gradient(circle at 90% 80%, rgba(0, 224, 255, 0.05) 0%, rgba(0, 224, 255, 0.05) 90%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        main {
+            flex: 1;
         }
         
         /* 标题样式 */
         h1 {
             font-size: 2.5rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text-primary);
             margin: 0;
+            line-height: 1.2;
+        }
+        
+        /* 头部标题样式 */
+        header h1 {
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background: none;
+            -webkit-background-clip: none;
+            -webkit-text-fill-color: white;
         }
         
         h2 {
@@ -68,37 +90,36 @@
         
         /* 头部样式 */
         header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 40px;
-            border-radius: var(--radius-xl);
+            background: var(--bg-primary);
+            color: var(--primary-color);
+            padding: 24px 32px;
+            border: 1px solid var(--primary-color);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
             text-align: center;
             margin-bottom: 32px;
-            box-shadow: var(--shadow-lg);
             position: relative;
             overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
         header::before {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            transform: rotate(45deg);
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--primary-color), transparent);
+            animation: scanline 2s linear infinite;
         }
         
-        header::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 100%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            transform: rotate(-45deg);
+        @keyframes scanline {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
         }
         
         header > * {
@@ -106,91 +127,202 @@
             z-index: 1;
         }
         
+        header h1 {
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+            margin: 0;
+            font-size: 2.25rem;
+        }
+        
         header p {
             margin-top: 16px;
-            font-size: 1.125rem;
-            opacity: 0.95;
+            font-size: 1.1rem;
+            color: var(--secondary-color);
             font-weight: 500;
+            line-height: 1.5;
+        }
+        
+        /* 终端风格标题装饰 */
+        .terminal-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .terminal-header::before,
+        .terminal-header::after {
+            content: '▬';
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            flex: 1;
+            text-align: center;
+            letter-spacing: -2px;
         }
         
         /* 报告列表样式 */
         .report-list {
             list-style: none;
             padding: 0;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
         }
         
         .report-item {
             background-color: var(--bg-primary);
-            padding: 24px;
-            margin-bottom: 20px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-light);
             transition: var(--transition);
-            border: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .report-item:last-child {
+            border-bottom: none;
+        }
+        
+        .report-item::before {
+            content: '├─';
+            color: var(--primary-color);
+            margin-right: 12px;
+            font-weight: bold;
+        }
+        
+        .report-item:last-child::before {
+            content: '└─';
         }
         
         .report-item:hover {
-            box-shadow: var(--shadow-xl);
-            transform: translateY(-2px);
+            background-color: var(--bg-secondary);
             border-color: var(--primary-color);
+            transform: translateX(4px);
+        }
+        
+        .report-item:hover::before {
+            color: var(--secondary-color);
         }
         
         .report-link {
-            color: var(--text-primary);
+            color: var(--secondary-color);
             text-decoration: none;
             font-size: 1.25rem;
             font-weight: 700;
             transition: var(--transition);
             flex: 1;
+            position: relative;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .report-link::before {
+            content: '📄';
+            margin-right: 8px;
+            color: var(--primary-color);
         }
         
         .report-link:hover {
             color: var(--primary-color);
             text-decoration: none;
+            text-shadow: 0 0 8px rgba(0, 255, 65, 0.4);
         }
         
         .report-info {
-            color: var(--text-muted);
+            color: var(--text-secondary);
             font-size: 0.875rem;
-            margin-top: 8px;
+            margin-top: 4px;
+            font-family: 'Courier New', monospace;
         }
         
         .report-count {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
+            background: var(--bg-primary);
+            color: var(--primary-color);
             padding: 8px 16px;
-            border-radius: var(--radius-lg);
+            border: 1px solid var(--primary-color);
             font-size: 0.875rem;
             font-weight: 600;
             margin-left: 20px;
             min-width: 80px;
             text-align: center;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
+            transition: var(--transition);
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
+        }
+        
+        .report-item:hover .report-count {
+            background: var(--primary-color);
+            color: var(--bg-primary);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+            transform: scale(1.05);
         }
         
         /* 空状态样式 */
         .empty-state {
             text-align: center;
-            padding: 64px 20px;
+            padding: 80px 20px;
             color: var(--text-muted);
+            background-color: var(--bg-primary);
+            border: 1px dashed var(--border-color);
+            margin-top: 24px;
+            font-family: 'Courier New', monospace;
         }
         
         .empty-state h3 {
-            font-size: 1.25rem;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+        
+        .empty-state p {
+            font-size: 1rem;
+            line-height: 1.6;
         }
         
         /* 页脚样式 */
         footer {
             text-align: center;
-            margin-top: 48px;
+            margin-top: 64px;
             padding: 24px 0;
-            color: var(--text-muted);
-            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
             border-top: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            margin: 64px -20px 0 -20px;
+            padding-left: 20px;
+            padding-right: 20px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        footer::before {
+            content: '▬';
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 16px;
+            font-size: 1.2rem;
+            letter-spacing: -1px;
+        }
+        
+        footer p {
+            margin: 0;
+            line-height: 1.6;
+        }
+        
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease, text-decoration 0.3s ease;
+            font-weight: 500;
+        }
+        
+        footer a:hover {
+            color: var(--secondary-color);
+            text-shadow: 0 0 8px rgba(0, 224, 255, 0.4);
         }
         
         /* 响应式设计 */
@@ -213,7 +345,7 @@
             }
             
             header p {
-                font-size: 1rem;
+                font-size: 1.1rem;
             }
             
             .report-item {
@@ -221,16 +353,31 @@
                 margin-bottom: 16px;
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 12px;
             }
             
             .report-link {
-                font-size: 1.125rem;
+                font-size: 1.15rem;
             }
             
             .report-count {
                 margin-left: 0;
-                margin-top: 12px;
+                padding: 8px 14px;
+                min-width: 70px;
                 align-self: flex-end;
+            }
+            
+            .report-info {
+                font-size: 0.9rem;
+            }
+            
+            .empty-state {
+                padding: 64px 20px;
+            }
+            
+            footer {
+                margin: 48px -16px 0 -16px;
+                padding: 24px 16px;
             }
         }
         
@@ -244,49 +391,80 @@
             }
             
             h2 {
-                font-size: 1.5rem;
+                font-size: 1.35rem;
             }
             
             header {
-                padding: 24px 20px;
+                padding: 28px 20px;
                 margin-bottom: 20px;
             }
             
+            header p {
+                font-size: 1rem;
+            }
+            
             .report-item {
-                padding: 20px;
-                margin-bottom: 16px;
+                padding: 18px;
+                margin-bottom: 14px;
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 12px;
             }
             
             .report-link {
-                font-size: 1.125rem;
+                font-size: 1.1rem;
             }
             
             .report-count {
                 margin-left: 0;
-                margin-top: 12px;
+                padding: 8px 16px;
+                min-width: 80px;
                 align-self: flex-end;
+            }
+            
+            .report-info {
+                font-size: 0.85rem;
+            }
+            
+            .empty-state {
+                padding: 48px 16px;
+            }
+            
+            .empty-state h3 {
+                font-size: 1.25rem;
+            }
+            
+            footer {
+                margin: 40px -12px 0 -12px;
+                padding: 20px 12px;
             }
         }
         
         /* 滚动条样式 */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 12px;
         }
         
         ::-webkit-scrollbar-track {
             background: var(--bg-tertiary);
-            border-radius: 4px;
+            border-radius: 6px;
         }
         
         ::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 4px;
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+            border-radius: 6px;
+            border: 3px solid var(--bg-tertiary);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
         }
         
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
+            background: linear-gradient(to bottom, var(--primary-dark), var(--secondary-color));
+        }
+        
+        /* Firefox滚动条样式 */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--bg-tertiary);
         }
         
         /* 加载动画效果 */
@@ -319,21 +497,22 @@
     </style>
 </head>
 <body>
-    <header>
-        <h1>DarkWeb论坛数据泄露监控</h1>
-        <p>DarkWeb Forums Tracker Reports</p>
+    <header style="border: 1px solid var(--primary-color); box-shadow: 0 0 20px rgba(0, 255, 65, 0.3); padding: 32px 24px; text-align: center; margin-bottom: 32px; border-radius: 16px; background: var(--bg-primary);">
+        <h1 style="color: var(--primary-color); text-shadow: 0 0 20px rgba(0, 255, 65, 0.8); font-size: 2.5rem; margin-bottom: 16px; font-family: 'Courier New', monospace;">DARKWEB论坛数据泄露监控系统</h1>
+        <p style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 10px rgba(0, 224, 255, 0.5); font-size: 1.25rem; font-family: 'Courier New', monospace;">🌐 DARKWEB FORUMS TRACKER 监控报告</p>
     </header>
     
     <main>
-        <h2>Reports</h2>
-        <ul class="report-list">
+        <div style="text-align: center; margin-bottom: 32px;">
+            <h2 style="color: var(--warning-color); text-shadow: 0 0 15px rgba(255, 255, 0, 0.6); font-size: 2rem; text-align: center; margin-bottom: 0; padding: 16px 32px; border: 1px solid var(--warning-color); border-radius: 12px; background: var(--bg-primary); font-family: 'Courier New', monospace; box-shadow: 0 0 15px rgba(255, 255, 0, 0.2); display: inline-block;">威 胁 情 报</h2>
+        </div>
+        <ul class="report-list" style="list-style: none; padding: 0; margin: 0;">
             
-            <li class="report-item">
-                <div>
-                    <a href="archive/2026-01-02/Daily_2026-01-02.html" class="report-link" target="_blank">2026-01-02</a>
-                    <div class="report-info">Generated report</div>
+            <li class="report-item" style="background: var(--bg-primary); border: 1px solid var(--primary-color); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 20px; border-radius: 12px; transition: all 0.3s ease; display: flex; justify-content: space-between; align-items: center;">
+                <a href="archive/2026-01-03/Daily_2026-01-03.html" class="report-link" target="_blank" style="color: var(--secondary-color); text-decoration: none; font-size: 1.25rem; font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); transition: all 0.3s ease; font-family: 'Courier New', monospace;">2026-01-03</a>
+                <div class="report-count" style="background: var(--bg-primary); color: var(--primary-color); padding: 10px 20px; border: 1px solid var(--primary-color); border-radius: 8px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); transition: all 0.3s ease; font-family: 'Courier New', monospace; text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);">
+                    287 条
                 </div>
-                <div class="report-count">255 items</div>
             </li>
             
         </ul>
@@ -341,32 +520,9 @@
         
     </main>
     
-    <footer>
-        <p>Power By 东方隐侠安全团队·Anonymous@ <a href="https://www.dfyxsec.com/" target="_blank">隐侠安全客栈</a></p>
+    <footer style="text-align: center; margin-top: 64px; padding: 24px; color: var(--text-primary); font-size: 0.9rem; font-family: 'Courier New', monospace;">
+        <p>Power By 东方隐侠安全团队 Anonymous@ <a href="https://www.dfyxsec.com/" target="_blank" style="color: var(--primary-color); text-decoration: none; transition: all 0.3s ease; text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);">隐侠安全客栈</a></p>
     </footer>
-    
-    <!-- 回到顶部按钮 -->
-    <button class="back-to-top" onclick="scrollToTop()" title="回到顶部">↑</button>
-    
-    <script>
-        // 回到顶部按钮功能
-        function scrollToTop() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
-        
-        // 滚动时显示/隐藏回到顶部按钮
-        window.addEventListener('scroll', function() {
-            const backToTopBtn = document.querySelector('.back-to-top');
-            if (window.pageYOffset > 300) {
-                backToTopBtn.classList.add('visible');
-            } else {
-                backToTopBtn.classList.remove('visible');
-            }
-        });
-    </script>
 </body>
 </html>
     

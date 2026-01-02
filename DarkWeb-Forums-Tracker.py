@@ -53,6 +53,55 @@ def get_git_version():
         print(f"获取Git版本信息失败: {str(e)}")
         return __version__
 
+# 站点名称到URL的映射字典
+site_url_map = {
+    "Xforums.st": "https://Xforums.st",
+    "gerki": "https://gerki",
+    "blackbones": "https://blackbones",
+    "hard-tm": "https://hard-tm",
+    "ascarding": "https://ascarding",
+    "htdark": "https://htdark",
+    "niflheim": "https://niflheim",
+    "mipped": "https://mipped",
+    "leakbase": "https://leakbase",
+    "dublikat": "https://dublikat",
+    "darkforums.io": "https://darkforums.io",
+    "sinister": "https://sinister",
+    "cardforum": "https://cardforum",
+    "ipbmafia": "https://ipbmafia"
+}
+
+# 检查网站可用性的函数
+def check_site_availability(site_name):
+    """
+    检查网站可用性
+    根据site_name映射到实际URL进行真实的HTTP请求检查
+    """
+    # 获取站点对应的URL
+    site_url = site_url_map.get(site_name)
+    if not site_url:
+        # 如果没有找到对应的URL，默认返回可用
+        return True
+    
+    try:
+        # 发送HEAD请求检查网站可用性，将超时时间减少到2秒
+        # 添加代理支持和其他优化
+        proxies = get_proxies()
+        response = requests.head(
+            site_url, 
+            timeout=2, 
+            proxies=proxies,
+            allow_redirects=True,
+            headers={
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+        )
+        # 如果状态码在200-399之间，认为网站可用
+        return 200 <= response.status_code < 400
+    except requests.RequestException as e:
+        # 任何异常都认为网站不可用，不打印详细错误
+        return False
+
 # 加载配置文件
 def load_config():
     # 从文件加载配置
@@ -776,9 +825,8 @@ def get_data_statistics(cursor, report_type="daily"):
         cursor.execute("SELECT COUNT(*) FROM items WHERE date(timestamp) = date('now')")
         statistics['total_count'] = cursor.fetchone()[0]
         
-        # 按数据源统计数量（根据标题前缀或链接识别数据源）
-        # 使用SQLite兼容的方式获取标题前缀，SUBSTRING_INDEX是MySQL函数，SQLite不支持
-        cursor.execute("SELECT title, COUNT(*) as count FROM items WHERE date(timestamp) = date('now') GROUP BY SUBSTR(title, 1, INSTR(title || ' ', ' ') - 1) ORDER BY count DESC")
+        # 按数据源统计数量（使用site_name字段）
+        cursor.execute("SELECT site_name, COUNT(*) as count FROM items WHERE date(timestamp) = date('now') GROUP BY site_name ORDER BY count DESC")
         statistics['by_source'] = cursor.fetchall()
         
         # 按小时统计数量
@@ -790,9 +838,8 @@ def get_data_statistics(cursor, report_type="daily"):
         cursor.execute("SELECT COUNT(*) FROM items WHERE timestamp >= date('now', 'start of week', '+1 day') AND timestamp <= date('now', 'start of week', '+7 days')")
         statistics['total_count'] = cursor.fetchone()[0]
         
-        # 按数据源统计数量
-        # 使用SQLite兼容的方式获取标题前缀，SUBSTRING_INDEX是MySQL函数，SQLite不支持
-        cursor.execute("SELECT SUBSTR(title, 1, INSTR(title || ' ', ' ') - 1) as source, COUNT(*) as count FROM items WHERE timestamp >= date('now', 'start of week', '+1 day') AND timestamp <= date('now', 'start of week', '+7 days') GROUP BY source ORDER BY count DESC")
+        # 按数据源统计数量（使用site_name字段）
+        cursor.execute("SELECT site_name, COUNT(*) as count FROM items WHERE timestamp >= date('now', 'start of week', '+1 day') AND timestamp <= date('now', 'start of week', '+7 days') GROUP BY site_name ORDER BY count DESC")
         statistics['by_source'] = cursor.fetchall()
         
         # 按日期统计数量
@@ -814,8 +861,8 @@ def generate_daily_report(cursor):
     archive_dir = f'archive/{current_date}'
     os.makedirs(archive_dir, exist_ok=True)
     
-    # 从数据库中获取当天的所有数据泄露信息
-    cursor.execute("SELECT title, link, timestamp FROM items WHERE date(timestamp) = date('now') ORDER BY timestamp DESC")
+    # 从数据库中获取当天的所有数据泄露信息，包含来源站点
+    cursor.execute("SELECT title, link, timestamp, site_name FROM items WHERE date(timestamp) = date('now') ORDER BY timestamp DESC")
     data_leaks = cursor.fetchall()
     
     # 获取统计信息
@@ -832,9 +879,7 @@ def generate_daily_report(cursor):
     # 按数据源统计
     markdown_content += "### 按数据源统计\n"
     for source, count in statistics['by_source']:
-        # 从标题中提取数据源名称（前几个字符）
-        source_name = source.split(' ')[0] if source else '未知'
-        markdown_content += f"- {source_name}: {count} 条\n"
+        markdown_content += f"- {source}: {count} 条\n"
     markdown_content += "\n"
     
     # 按小时统计
@@ -846,15 +891,23 @@ def generate_daily_report(cursor):
     # 准备数据泄露信息，用于HTML模板
     leak_list = []
     for leak in data_leaks:
-        title, link, timestamp = leak
+        title, link, timestamp, site_name = leak
         markdown_content += f"## [{title}]({link})\n"
-        markdown_content += f"发布时间：{timestamp}\n\n"
+        markdown_content += f"发布时间：{timestamp}\n"
+        markdown_content += f"来源站点：{site_name}\n\n"
+        
+        # 暂时不进行实时可用性检查，避免生成报告时卡住
+        # is_available = check_site_availability(site_name)
+        # 默认为True，后续可以考虑异步或定时检查
+        is_available = True
         
         # 添加到数据泄露信息列表
         leak_list.append({
             'title': title,
             'link': link,
-            'timestamp': timestamp
+            'timestamp': timestamp,
+            'site_name': site_name,
+            'is_available': is_available
         })
     
     # 添加Power By信息（纯markdown格式，避免HTML标签在Discord中显示为文本）
@@ -921,6 +974,7 @@ def generate_daily_report(cursor):
     return markdown_file, markdown_content
 
 # 生成周报
+# 生成周报
 def generate_weekly_report(cursor):
     """
     生成周报
@@ -934,8 +988,8 @@ def generate_weekly_report(cursor):
     print("开始生成周报...")
     
     # 获取当前日期和时间
-    current_date = time.strftime('%Y-%m-%d', time.localtime())
-    current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+    current_date = time.strftime("%Y-%m-%d", time.localtime())
+    current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     
     # 获取本周的开始和结束日期（周一到周日）
     cursor.execute("SELECT date('now', 'start of week', '+1 day') as start_date, date('now', 'start of week', '+7 days') as end_date")
@@ -955,62 +1009,73 @@ def generate_weekly_report(cursor):
     archive_dir = f'archive/Weekly_{start_date}'
     os.makedirs(archive_dir, exist_ok=True)
     
-    # 从数据库中获取本周的所有数据泄露信息
-    cursor.execute("SELECT title, link, timestamp FROM items WHERE timestamp >= ? AND timestamp <= ? ORDER BY timestamp DESC", (start_date, end_date))
+    # 从数据库中获取本周的所有数据泄露信息，包含来源站点
+    cursor.execute("SELECT title, link, timestamp, site_name FROM items WHERE timestamp >= ? AND timestamp <= ? ORDER BY timestamp DESC", (start_date, end_date))
     data_leaks = cursor.fetchall()
     
     # 获取统计信息
     statistics = get_data_statistics(cursor, report_type="weekly")
     
     # 生成markdown内容
-    markdown_content = f"# 数据泄露监控周报 {start_date} - {end_date}\n\n"
-    markdown_content += f"共收集到 {statistics['total_count']} 条数据泄露相关信息\n"
-    markdown_content += f"最后更新时间：{current_time}\n\n"
+    markdown_content = f'# 数据泄露监控周报 {start_date} - {end_date}'
+
+    markdown_content += f'共收集到 {statistics["total_count"]} 条数据泄露相关信息'
+    markdown_content += f'最后更新时间：{current_time}'
+
     
     # 添加统计信息
     markdown_content += "## 本周统计\n\n"
     
     # 按日期统计
     markdown_content += "### 按日期统计\n"
-    for date, count in statistics['by_date']:
-        markdown_content += f"- {date}: {count} 条\n"
+    for date, count in statistics["by_date"]:
+        markdown_content += f'- {date}: {count} 条\n'
     markdown_content += "\n"
     
     # 按数据源统计
     markdown_content += "### 按数据源统计\n"
-    for source, count in statistics['by_source']:
-        markdown_content += f"- {source}: {count} 条\n"
+    for source, count in statistics["by_source"]:
+        markdown_content += f'- {source}: {count} 条\n'
     markdown_content += "\n"
     
     # 准备数据泄露信息，用于HTML模板
     leak_list = []
     for leak in data_leaks:
-        title, link, timestamp = leak
-        markdown_content += f"## [{title}]({link})\n"
-        markdown_content += f"发布时间：{timestamp}\n\n"
+        title, link, timestamp, site_name = leak
+        markdown_content += f'## [{title}]({link})'
+        markdown_content += f'发布时间：{timestamp}'
+        markdown_content += f'来源站点：{site_name}'
+
+        
+        # 暂时不进行实时可用性检查，避免生成报告时卡住
+        # is_available = check_site_availability(site_name)
+        # 默认为True，后续可以考虑异步或定时检查
+        is_available = True
         
         # 添加到数据泄露信息列表
         leak_list.append({
             'title': title,
             'link': link,
-            'timestamp': timestamp
+            'timestamp': timestamp,
+            'site_name': site_name,
+            'is_available': is_available
         })
     
     # 添加Power By信息
-    markdown_content += f"---\n"
-    markdown_content += f"Power By 东方隐侠安全团队·Anonymous@ [隐侠安全客栈](https://www.dfyxsec.com/)\n"
-    markdown_content += f"---\n"
+    markdown_content += f'---'
+    markdown_content += f'Power By 东方隐侠安全团队·Anonymous@ [隐侠安全客栈](https://www.dfyxsec.com/)'
+    markdown_content += f'---'
     
     # 写入markdown文件
-    markdown_file = f'{archive_dir}/Weekly_{start_date}_{end_date}.md'
+    markdown_file = f'archive/Weekly_{start_date}_{end_date}.md'
     is_update = os.path.exists(markdown_file)
     with open(markdown_file, 'w', encoding='utf-8') as f:
         f.write(markdown_content)
     
     if is_update:
-        print(f"Markdown周报已更新：{markdown_file}")
+        print(f'Markdown周报已更新：{markdown_file}')
     else:
-        print(f"Markdown周报已生成：{markdown_file}")
+        print(f'Markdown周报已生成：{markdown_file}')
     
     # 生成HTML内容
     try:
@@ -1021,25 +1086,25 @@ def generate_weekly_report(cursor):
         # 渲染HTML模板
         template = Template(template_content)
         html_content = template.render(
-            date=f"{start_date} - {end_date}",
-            count=statistics['total_count'],
+            date=f'{start_date} - {end_date}',
+            count=statistics["total_count"],
             update_time=current_time,
             articles=leak_list,
             statistics=statistics
         )
         
         # 写入HTML文件
-        html_file = f'{archive_dir}/Weekly_{start_date}_{end_date}.html'
+        html_file = f'archive/Weekly_{start_date}_{end_date}.html'
         with open(html_file, 'w', encoding='utf-8') as f:
             f.write(html_content)
         
         if is_update:
-            print(f"HTML周报已更新：{html_file}")
+            print(f'HTML周报已更新：{html_file}')
         else:
-            print(f"HTML周报已生成：{html_file}")
+            print(f'HTML周报已生成：{html_file}')
         
         # 更新index.html
-        update_index_html(current_date, leak_list, statistics['total_count'])
+        update_index_html(current_date, leak_list, statistics["total_count"])
         
         # Discard推送周报
         config = load_config()
@@ -1047,19 +1112,18 @@ def generate_weekly_report(cursor):
         if 'discard' in push_config and push_config['discard'].get('switch', '') == "ON" and push_config['discard'].get('send_weekly_report', '') == "ON":
             send_discard_msg(
                 push_config['discard'].get('webhook'),
-                f"数据泄露监控周报 {start_date} - {end_date}",
-                f"共收集到 {statistics['total_count']} 条数据泄露相关信息",
+                f'数据泄露监控周报 {start_date} - {end_date}',
+                f'共收集到 {statistics["total_count"]} 条数据泄露相关信息',
                 is_weekly_report=True,
                 html_file=html_file,
                 markdown_content=markdown_content
             )
         
     except Exception as e:
-        print(f"生成HTML周报失败：{str(e)}")
+        print(f'生成HTML周报失败：{str(e)}')
     
     return markdown_file, markdown_content
 
-# 更新index.html
 def update_index_html(current_date, article_list, count):
     print("更新index.html...")
     
@@ -1079,50 +1143,72 @@ def update_index_html(current_date, article_list, count):
         }
         
         :root {
-            --primary-color: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary-color: #8b5cf6;
-            --accent-color: #ec4899;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --text-muted: #9ca3af;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9fafb;
-            --bg-tertiary: #f3f4f6;
-            --border-color: #e5e7eb;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --radius-sm: 6px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --radius-xl: 16px;
-            --transition: all 0.3s ease;
+            /* 终端风格配色 */
+            --bg-primary: #0a0e17;
+            --bg-secondary: #121721;
+            --bg-tertiary: #1a1f2e;
+            --bg-gradient: linear-gradient(135deg, #00ff41, #00e0ff);
+            --primary-color: #00ff41;
+            --primary-dark: #00d437;
+            --secondary-color: #00e0ff;
+            --accent-color: #ff007f;
+            --success-color: #00ff41;
+            --warning-color: #ffff00;
+            --danger-color: #ff007f;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b8c1;
+            --text-muted: #6b7280;
+            --border-color: #2d3748;
+            --border-light: #222936;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 255, 65, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 255, 65, 0.15), 0 2px 4px -1px rgba(0, 255, 65, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 255, 65, 0.2), 0 4px 6px -2px rgba(0, 255, 65, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 255, 65, 0.25), 0 10px 10px -5px rgba(0, 255, 65, 0.15);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 255, 65, 0.3);
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 10px;
+            --radius-2xl: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            line-height: 1.6;
+            font-family: 'Courier New', Courier, 'Consolas', 'Monaco', 'Ubuntu Mono', monospace;
+            line-height: 1.7;
             color: var(--text-primary);
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
             background-color: var(--bg-secondary);
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(100, 106, 245, 0.05) 0%, rgba(100, 106, 245, 0.05) 90%),
-                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 90%);
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 65, 0.05) 0%, rgba(0, 255, 65, 0.05) 90%),
+                radial-gradient(circle at 90% 80%, rgba(0, 224, 255, 0.05) 0%, rgba(0, 224, 255, 0.05) 90%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        main {
+            flex: 1;
         }
         
         /* 标题样式 */
         h1 {
             font-size: 2.5rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text-primary);
             margin: 0;
+            line-height: 1.2;
+        }
+        
+        /* 头部标题样式 */
+        header h1 {
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background: none;
+            -webkit-background-clip: none;
+            -webkit-text-fill-color: white;
         }
         
         h2 {
@@ -1134,37 +1220,36 @@ def update_index_html(current_date, article_list, count):
         
         /* 头部样式 */
         header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 40px;
-            border-radius: var(--radius-xl);
+            background: var(--bg-primary);
+            color: var(--primary-color);
+            padding: 24px 32px;
+            border: 1px solid var(--primary-color);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
             text-align: center;
             margin-bottom: 32px;
-            box-shadow: var(--shadow-lg);
             position: relative;
             overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
         header::before {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            transform: rotate(45deg);
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--primary-color), transparent);
+            animation: scanline 2s linear infinite;
         }
         
-        header::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 100%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            transform: rotate(-45deg);
+        @keyframes scanline {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
         }
         
         header > * {
@@ -1172,91 +1257,202 @@ def update_index_html(current_date, article_list, count):
             z-index: 1;
         }
         
+        header h1 {
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+            margin: 0;
+            font-size: 2.25rem;
+        }
+        
         header p {
             margin-top: 16px;
-            font-size: 1.125rem;
-            opacity: 0.95;
+            font-size: 1.1rem;
+            color: var(--secondary-color);
             font-weight: 500;
+            line-height: 1.5;
+        }
+        
+        /* 终端风格标题装饰 */
+        .terminal-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .terminal-header::before,
+        .terminal-header::after {
+            content: '▬';
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            flex: 1;
+            text-align: center;
+            letter-spacing: -2px;
         }
         
         /* 报告列表样式 */
         .report-list {
             list-style: none;
             padding: 0;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
         }
         
         .report-item {
             background-color: var(--bg-primary);
-            padding: 24px;
-            margin-bottom: 20px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-light);
             transition: var(--transition);
-            border: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .report-item:last-child {
+            border-bottom: none;
+        }
+        
+        .report-item::before {
+            content: '├─';
+            color: var(--primary-color);
+            margin-right: 12px;
+            font-weight: bold;
+        }
+        
+        .report-item:last-child::before {
+            content: '└─';
         }
         
         .report-item:hover {
-            box-shadow: var(--shadow-xl);
-            transform: translateY(-2px);
+            background-color: var(--bg-secondary);
             border-color: var(--primary-color);
+            transform: translateX(4px);
+        }
+        
+        .report-item:hover::before {
+            color: var(--secondary-color);
         }
         
         .report-link {
-            color: var(--text-primary);
+            color: var(--secondary-color);
             text-decoration: none;
             font-size: 1.25rem;
             font-weight: 700;
             transition: var(--transition);
             flex: 1;
+            position: relative;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .report-link::before {
+            content: '📄';
+            margin-right: 8px;
+            color: var(--primary-color);
         }
         
         .report-link:hover {
             color: var(--primary-color);
             text-decoration: none;
+            text-shadow: 0 0 8px rgba(0, 255, 65, 0.4);
         }
         
         .report-info {
-            color: var(--text-muted);
+            color: var(--text-secondary);
             font-size: 0.875rem;
-            margin-top: 8px;
+            margin-top: 4px;
+            font-family: 'Courier New', monospace;
         }
         
         .report-count {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
+            background: var(--bg-primary);
+            color: var(--primary-color);
             padding: 8px 16px;
-            border-radius: var(--radius-lg);
+            border: 1px solid var(--primary-color);
             font-size: 0.875rem;
             font-weight: 600;
             margin-left: 20px;
             min-width: 80px;
             text-align: center;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
+            transition: var(--transition);
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
+        }
+        
+        .report-item:hover .report-count {
+            background: var(--primary-color);
+            color: var(--bg-primary);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+            transform: scale(1.05);
         }
         
         /* 空状态样式 */
         .empty-state {
             text-align: center;
-            padding: 64px 20px;
+            padding: 80px 20px;
             color: var(--text-muted);
+            background-color: var(--bg-primary);
+            border: 1px dashed var(--border-color);
+            margin-top: 24px;
+            font-family: 'Courier New', monospace;
         }
         
         .empty-state h3 {
-            font-size: 1.25rem;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+        
+        .empty-state p {
+            font-size: 1rem;
+            line-height: 1.6;
         }
         
         /* 页脚样式 */
         footer {
             text-align: center;
-            margin-top: 48px;
+            margin-top: 64px;
             padding: 24px 0;
-            color: var(--text-muted);
-            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
             border-top: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            margin: 64px -20px 0 -20px;
+            padding-left: 20px;
+            padding-right: 20px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        footer::before {
+            content: '▬';
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 16px;
+            font-size: 1.2rem;
+            letter-spacing: -1px;
+        }
+        
+        footer p {
+            margin: 0;
+            line-height: 1.6;
+        }
+        
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease, text-decoration 0.3s ease;
+            font-weight: 500;
+        }
+        
+        footer a:hover {
+            color: var(--secondary-color);
+            text-shadow: 0 0 8px rgba(0, 224, 255, 0.4);
         }
         
         /* 响应式设计 */
@@ -1279,7 +1475,7 @@ def update_index_html(current_date, article_list, count):
             }
             
             header p {
-                font-size: 1rem;
+                font-size: 1.1rem;
             }
             
             .report-item {
@@ -1287,16 +1483,31 @@ def update_index_html(current_date, article_list, count):
                 margin-bottom: 16px;
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 12px;
             }
             
             .report-link {
-                font-size: 1.125rem;
+                font-size: 1.15rem;
             }
             
             .report-count {
                 margin-left: 0;
-                margin-top: 12px;
+                padding: 8px 14px;
+                min-width: 70px;
                 align-self: flex-end;
+            }
+            
+            .report-info {
+                font-size: 0.9rem;
+            }
+            
+            .empty-state {
+                padding: 64px 20px;
+            }
+            
+            footer {
+                margin: 48px -16px 0 -16px;
+                padding: 24px 16px;
             }
         }
         
@@ -1310,49 +1521,80 @@ def update_index_html(current_date, article_list, count):
             }
             
             h2 {
-                font-size: 1.5rem;
+                font-size: 1.35rem;
             }
             
             header {
-                padding: 24px 20px;
+                padding: 28px 20px;
                 margin-bottom: 20px;
             }
             
+            header p {
+                font-size: 1rem;
+            }
+            
             .report-item {
-                padding: 20px;
-                margin-bottom: 16px;
+                padding: 18px;
+                margin-bottom: 14px;
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 12px;
             }
             
             .report-link {
-                font-size: 1.125rem;
+                font-size: 1.1rem;
             }
             
             .report-count {
                 margin-left: 0;
-                margin-top: 12px;
+                padding: 8px 16px;
+                min-width: 80px;
                 align-self: flex-end;
+            }
+            
+            .report-info {
+                font-size: 0.85rem;
+            }
+            
+            .empty-state {
+                padding: 48px 16px;
+            }
+            
+            .empty-state h3 {
+                font-size: 1.25rem;
+            }
+            
+            footer {
+                margin: 40px -12px 0 -12px;
+                padding: 20px 12px;
             }
         }
         
         /* 滚动条样式 */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 12px;
         }
         
         ::-webkit-scrollbar-track {
             background: var(--bg-tertiary);
-            border-radius: 4px;
+            border-radius: 6px;
         }
         
         ::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 4px;
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+            border-radius: 6px;
+            border: 3px solid var(--bg-tertiary);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
         }
         
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
+            background: linear-gradient(to bottom, var(--primary-dark), var(--secondary-color));
+        }
+        
+        /* Firefox滚动条样式 */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--bg-tertiary);
         }
         
         /* 加载动画效果 */
@@ -1385,59 +1627,37 @@ def update_index_html(current_date, article_list, count):
     </style>
 </head>
 <body>
-    <header>
-        <h1>DarkWeb论坛数据泄露监控</h1>
-        <p>DarkWeb Forums Tracker Reports</p>
+    <header style="border: 1px solid var(--primary-color); box-shadow: 0 0 20px rgba(0, 255, 65, 0.3); padding: 32px 24px; text-align: center; margin-bottom: 32px; border-radius: 16px; background: var(--bg-primary);">
+        <h1 style="color: var(--primary-color); text-shadow: 0 0 20px rgba(0, 255, 65, 0.8); font-size: 2.5rem; margin-bottom: 16px; font-family: 'Courier New', monospace;">DARKWEB论坛数据泄露监控系统</h1>
+        <p style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 10px rgba(0, 224, 255, 0.5); font-size: 1.25rem; font-family: 'Courier New', monospace;">🌐 DARKWEB FORUMS TRACKER 监控报告</p>
     </header>
     
     <main>
-        <h2>Reports</h2>
-        <ul class="report-list">
+        <div style="text-align: center; margin-bottom: 32px;">
+            <h2 style="color: var(--warning-color); text-shadow: 0 0 15px rgba(255, 255, 0, 0.6); font-size: 2rem; text-align: center; margin-bottom: 0; padding: 16px 32px; border: 1px solid var(--warning-color); border-radius: 12px; background: var(--bg-primary); font-family: 'Courier New', monospace; box-shadow: 0 0 15px rgba(255, 255, 0, 0.2); display: inline-block;">威 胁 情 报</h2>
+        </div>
+        <ul class="report-list" style="list-style: none; padding: 0; margin: 0;">
             {% for report in reports %}
-            <li class="report-item">
-                <div>
-                    <a href="{{ report.path }}" class="report-link" target="_blank">{{ report.date }}</a>
-                    <div class="report-info">Generated report</div>
+            <li class="report-item" style="background: var(--bg-primary); border: 1px solid var(--primary-color); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 20px; border-radius: 12px; transition: all 0.3s ease; display: flex; justify-content: space-between; align-items: center; text-align: center;">
+                <a href="{{ report.path }}" class="report-link" target="_blank" style="color: var(--secondary-color); text-decoration: none; font-size: 1.25rem; font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); transition: all 0.3s ease; font-family: 'Courier New', monospace;">{{ report.date }}</a>
+                <div class="report-count" style="background: var(--bg-primary); color: var(--primary-color); padding: 10px 20px; border: 1px solid var(--primary-color); border-radius: 8px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); transition: all 0.3s ease; font-family: 'Courier New', monospace; text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);">
+                    {{ report.count }} 条
                 </div>
-                <div class="report-count">{{ report.count }} items</div>
             </li>
             {% endfor %}
         </ul>
         
         {% if not reports %}
-        <div class="empty-state">
-            <h3>No reports available yet</h3>
-            <p>Reports will be generated automatically based on monitoring data</p>
+        <div class="empty-state" style="text-align: center; padding: 60px 20px; background: var(--bg-primary); border: 1px solid var(--primary-color); border-radius: 12px; box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); margin-top: 20px;">
+            <h3 style="color: var(--warning-color); font-size: 1.5rem; margin-bottom: 16px; font-family: 'Courier New', monospace;">暂无报告</h3>
+            <p style="color: var(--text-secondary); font-size: 1rem; font-family: 'Courier New', monospace;">报告将根据监控数据自动生成</p>
         </div>
         {% endif %}
     </main>
     
-    <footer>
-        <p>Power By 东方隐侠安全团队·Anonymous@ <a href="https://www.dfyxsec.com/" target="_blank">隐侠安全客栈</a></p>
+    <footer style="text-align: center; margin-top: 64px; padding: 24px; color: var(--text-primary); font-size: 0.9rem; font-family: 'Courier New', monospace;">
+        <p>Power By 东方隐侠安全团队 Anonymous@ <a href="https://www.dfyxsec.com/" target="_blank" style="color: var(--primary-color); text-decoration: none; transition: all 0.3s ease; text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);">隐侠安全客栈</a></p>
     </footer>
-    
-    <!-- 回到顶部按钮 -->
-    <button class="back-to-top" onclick="scrollToTop()" title="回到顶部">↑</button>
-    
-    <script>
-        // 回到顶部按钮功能
-        function scrollToTop() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
-        
-        // 滚动时显示/隐藏回到顶部按钮
-        window.addEventListener('scroll', function() {
-            const backToTopBtn = document.querySelector('.back-to-top');
-            if (window.pageYOffset > 300) {
-                backToTopBtn.classList.add('visible');
-            } else {
-                backToTopBtn.classList.remove('visible');
-            }
-        });
-    </script>
 </body>
 </html>
     """
@@ -1590,14 +1810,14 @@ def main():
         elif args.once:
             # 单次执行模式，适合GitHub Action
             print("使用单次执行模式")
-            for website, config in rss_config.items():
+            for website, rss_item in rss_config.items():
                 # 检查数据源是否启用
                 if datasources_config.get(website, 1) == 0:
                     print(f"跳过禁用的数据源：{website}")
                     continue
                     
-                website_name = config.get("website_name")
-                rss_url = config.get("rss_url")
+                website_name = rss_item.get("website_name")
+                rss_url = rss_item.get("rss_url")
                 check_for_updates(rss_url, website_name, cursor, conn)
             
             # 检查是否需要生成日报
@@ -1626,14 +1846,14 @@ def main():
                         time.sleep(sleep_hours * 3600)
                         continue
                     
-                    for website, config in rss_config.items():
+                    for website, rss_item in rss_config.items():
                         # 检查数据源是否启用
                         if datasources_config.get(website, 1) == 0:
                             print(f"跳过禁用的数据源：{website}")
                             continue
                             
-                        website_name = config.get("website_name")
-                        rss_url = config.get("rss_url")
+                        website_name = rss_item.get("website_name")
+                        rss_url = rss_item.get("rss_url")
                         check_for_updates(rss_url, website_name, cursor, conn)
 
                     # 检查是否需要生成日报
