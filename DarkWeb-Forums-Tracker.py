@@ -11,7 +11,7 @@ import dingtalkchatbot.chatbot as cb
 from jinja2 import Template
 
 # 版本信息
-__version__ = "V1.0.8b"
+__version__ = "V1.0.9b"
 
 # 从Git仓库动态获取版本信息
 def get_git_version():
