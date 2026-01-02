@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DarkWeb-Forums-Tracker {{ date }}</title>
+    <title>DarkWeb Forums Tracker Reports {{ date }}</title>
     <style>
         /* 全局样式 */
         * {
@@ -167,6 +167,26 @@
             border-radius: 50%;
         }
         
+        .article-source,
+        .article-category {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .article-source::before,
+        .article-category::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background-color: var(--text-muted);
+            border-radius: 50%;
+        }
+        
         /* 页脚样式 */
         footer {
             text-align: center;
@@ -226,6 +246,70 @@
             }
         }
         
+        /* 统计信息样式 */
+        .statistics {
+            background-color: var(--bg-primary);
+            padding: 24px;
+            margin-bottom: 32px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+        
+        .statistics h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .statistics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .statistics-section {
+            background-color: var(--bg-secondary);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+        
+        .statistics-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+        
+        .statistics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+        
+        .statistics-item {
+            background-color: var(--bg-primary);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        .statistics-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .statistics-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
         /* 滚动条样式 */
         ::-webkit-scrollbar {
             width: 8px;
@@ -243,6 +327,37 @@
         
         ::-webkit-scrollbar-thumb:hover {
             background: var(--text-muted);
+        }
+        
+        /* 回到顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1000;
+        }
+        
+        .back-to-top:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
         }
         
         /* 加载动画效果 */
@@ -276,22 +391,96 @@
 </head>
 <body>
     <header>
-        <h1>DarkWeb-Forums-Tracker {{ date }}</h1>
+        <h1>DarkWeb论坛数据泄露监控报告 {{ date }}</h1>
         <div class="article-count">共收集到 {{ count }} 条数据泄露相关信息</div>
         <div class="update-time">最后更新时间：{{ update_time }}</div>
     </header>
+    
+    {% if statistics %}
+    <section class="statistics">
+        <h2>统计信息</h2>
+        <div class="statistics-container">
+            {% if statistics.by_source %}
+            <div class="statistics-section">
+                <h3>按数据源统计</h3>
+                <div class="statistics-grid">
+                    {% for source, count in statistics.by_source %}
+                    <div class="statistics-item">
+                        <div class="statistics-label">{{ source.split(' ')[0] if source else '未知' }}</div>
+                        <div class="statistics-value">{{ count }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if statistics.by_hour %}
+            <div class="statistics-section">
+                <h3>按小时统计</h3>
+                <div class="statistics-grid">
+                    {% for hour, count in statistics.by_hour %}
+                    <div class="statistics-item">
+                        <div class="statistics-label">{{ hour }}:00</div>
+                        <div class="statistics-value">{{ count }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if statistics.by_date %}
+            <div class="statistics-section">
+                <h3>按日期统计</h3>
+                <div class="statistics-grid">
+                    {% for date, count in statistics.by_date %}
+                    <div class="statistics-item">
+                        <div class="statistics-label">{{ date }}</div>
+                        <div class="statistics-value">{{ count }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
     
     <main>
         {% for article in articles %}
         <div class="article">
             <h2><a href="{{ article.link }}" class="article-title" target="_blank">{{ article.title }}</a></h2>
             <div class="article-time">发布时间：{{ article.timestamp }}</div>
+            {% if article.source %}<div class="article-source">数据源：{{ article.source }}</div>{% endif %}
+            {% if article.category %}<div class="article-category">分类：{{ article.category }}</div>{% endif %}
         </div>
         {% endfor %}
     </main>
     
     <footer>
-        <p>Generated by DarkWeb-Forums-Tracker</p>
+        <p>Power By 东方隐侠安全团队·Anonymous@ <a href="https://www.dfyxsec.com/" target="_blank">隐侠安全客栈</a></p>
     </footer>
+    
+    <!-- 回到顶部按钮 -->
+    <button class="back-to-top" onclick="scrollToTop()" title="回到顶部">↑</button>
+    
+    <script>
+        // 回到顶部按钮功能
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        
+        // 滚动时显示/隐藏回到顶部按钮
+        window.addEventListener('scroll', function() {
+            const backToTopBtn = document.querySelector('.back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+    </script>
 </body>
 </html>
