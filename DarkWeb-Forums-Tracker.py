@@ -451,9 +451,11 @@ def send_discard_msg(webhook, title, content, is_daily_report=False, is_weekly_r
                 'discard': 'Discard'
             }
             
-            for channel, channel_config in push_config.items():
+            # 只检查定义在channel_names中的推送渠道，确保只显示真实的推送渠道
+            for channel in channel_names:
+                channel_config = push_config.get(channel, {})
                 if channel_config.get('switch', '') == 'ON':
-                    enabled_channels.append(channel_names.get(channel, channel))
+                    enabled_channels.append(channel_names[channel])
             
             # 动态获取运行模式
             import sys

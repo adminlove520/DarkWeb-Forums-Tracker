@@ -20,9 +20,10 @@ jobs:
 
       - name: Get current version
         id: get_version
+        shell: bash
         run: |
           # 从代码中获取当前版本号
-          current_version=$(grep -oP '__version__ = "\K[^"]+' DarkWeb-Forums-Tracker.py)
+          current_version=$(grep -oP '__version__ = "[^"]+' DarkWeb-Forums-Tracker.py | cut -d'"' -f2)
           echo "Current version: $current_version"
           echo "current_version=$current_version" >> $GITHUB_OUTPUT
 
