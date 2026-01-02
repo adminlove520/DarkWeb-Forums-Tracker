@@ -64,7 +64,27 @@ jobs:
           sed -i "s/当前版本：\*\*.*\*\*/当前版本：\*\*$new_version\*\*/" README.md
           sed -i "s/版本创建时间：[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/版本创建时间：$current_date/" README.md
 
-      - name: Commit and push changes
+      - name: Check if tag exists
+        id: check_tag
+        shell: bash
+        run: |
+          if git rev-parse --verify "${{ steps.bump_version.outputs.new_version }}" 2>/dev/null; then
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+            echo "Tag ${{ steps.bump_version.outputs.new_version }} already exists"
+          else
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
+            echo "Tag ${{ steps.bump_version.outputs.new_version }} does not exist"
+          fi
+
+      - name: Commit and push changes without tagging
+        if: steps.check_tag.outputs.tag_exists == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Bump version to ${{ steps.bump_version.outputs.new_version }}"
+          push_options: --force-with-lease
+
+      - name: Commit and push changes with tagging
+        if: steps.check_tag.outputs.tag_exists == 'false'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Bump version to ${{ steps.bump_version.outputs.new_version }}"
