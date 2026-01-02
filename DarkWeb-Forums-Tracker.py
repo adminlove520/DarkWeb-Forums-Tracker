@@ -689,7 +689,17 @@ def generate_rss_feed(cursor, feed_type="daily"):
         data_leaks = cursor.fetchall()
         # 获取本周的开始和结束日期
         cursor.execute("SELECT date('now', 'start of week', '+1 day') as start_date, date('now', 'start of week', '+7 days') as end_date")
-        start_date, end_date = cursor.fetchone()
+        result = cursor.fetchone()
+        if result:
+            start_date, end_date = result
+        else:
+            # 如果获取失败，使用当前日期作为默认值
+            start_date = current_date
+            end_date = current_date
+        
+        # 确保日期不为None
+        start_date = start_date or current_date
+        end_date = end_date or current_date
         feed_title = f"数据泄露监控周报 RSS {start_date} - {end_date}"
         feed_description = f"每周数据泄露监控RSS feed，包含{start_date}到{end_date}的最新数据泄露信息"
         feed_link = f"https://adminlove520.github.io/DarkWeb-Forums-Tracker/rss/weekly_rss_{start_date}_{end_date}.xml"
@@ -908,7 +918,17 @@ def generate_weekly_report(cursor):
     
     # 获取本周的开始和结束日期（周一到周日）
     cursor.execute("SELECT date('now', 'start of week', '+1 day') as start_date, date('now', 'start of week', '+7 days') as end_date")
-    start_date, end_date = cursor.fetchone()
+    result = cursor.fetchone()
+    if result:
+        start_date, end_date = result
+    else:
+        # 如果获取失败，使用当前日期作为默认值
+        start_date = current_date
+        end_date = current_date
+    
+    # 确保日期不为None
+    start_date = start_date or current_date
+    end_date = end_date or current_date
     
     # 创建目录结构
     archive_dir = f'archive/Weekly_{start_date}'
