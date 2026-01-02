@@ -1,0 +1,95 @@
+name: Bug report
+description: Report errors or unexpected behavior
+title: "Bug: "
+labels: [bug]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请详细描述您遇到的问题，以便我们快速定位和解决。
+        感谢您的反馈！
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: 问题描述
+      description: 请详细描述您遇到的问题
+      placeholder: 例如：脚本运行时出现错误，无法推送消息
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: 复现步骤
+      description: 请详细描述如何复现这个问题
+      placeholder: |
+        1. 执行命令：python DarkWeb-Forums-Tracker.py --once
+        2. 观察输出
+        3. 查看日志文件
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: 预期行为
+      description: 请描述您期望的正常行为
+      placeholder: 例如：脚本正常运行，成功推送消息
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: 实际行为
+      description: 请描述实际发生的行为
+      placeholder: 例如：脚本运行失败，报错：ModuleNotFoundError
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-logs
+    attributes:
+      label: 错误日志
+      description: 请粘贴相关的错误日志或输出
+      render: bash
+
+  - type: input
+    id: environment
+    attributes:
+      label: 运行环境
+      description: 请描述您的运行环境
+      placeholder: 例如：Windows 10, Python 3.9, pip 22.0.4
+    validations:
+      required: true
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Python版本
+      description: 请输入您使用的Python版本
+      placeholder: 例如：3.9
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 检查项
+      description: 请确认以下信息
+      options:
+        - label: 我已检查过README和现有Issue
+          required: true
+        - label: 我已尝试重新安装依赖
+          required: false
+        - label: 我已尝试更新到最新版本
+          required: false
+
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: 附加信息
+      description: 请添加任何其他相关信息
+      placeholder: 例如：截图、配置文件片段等

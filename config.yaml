@@ -1,0 +1,64 @@
+# 配置推送
+push:
+  dingding:
+    webhook: "https://oapi.dingtalk.com/robot/send?access_token=你的token"
+    secret_key: "你的Key"
+    app_name: "钉钉"
+    switch: "OFF"  # 设置开关为 "ON" 进行推送，设置为其他值则不进行推送
+  feishu:
+    webhook: "飞书的webhook地址"
+    app_name: "飞书"
+    switch: "OFF"
+  tg_bot:
+    token: "Telegram Bot的token"
+    group_id: "Telegram Bot的group_id"
+    app_name: "Telegram Bot"
+    switch: "OFF"
+  discard:
+    webhook: ""
+    app_name: "Discard"
+    switch: "ON"  # 总开关
+    send_daily_report: "OFF"  # 日报只存储不推送，固定为OFF
+    send_normal_msg: "ON"  # 推送普通消息开关
+    send_weekly_report: "ON"  # 周报推送开关
+
+# RSS数据源开关配置
+# 1启用, 0禁用
+datasources:
+  "Xforums.st": 1
+  "gerki": 1
+  "blackbones": 1
+  "hard-tm": 1
+  "ascarding": 1
+  "htdark": 1
+  "niflheim": 1
+  "mipped": 1
+  "leakbase": 1
+  "dublikat": 1
+  "darkforums.io": 1
+  "sinister": 0
+  "cardforum": 1
+  "ipbmafia": 1
+
+# 周报配置
+weekly_report:
+  switch: "ON"  # 是否生成周报
+  push_switch: "ON"  # 是否推送周报
+  time: "15:00"  # 推送时间（北京时区）
+  day: 5  # 推送日期（周五，1-7代表周一到周日）
+
+# 代理配置
+proxy:
+  enable: "OFF"  # 设置为 "ON" 启用代理
+  http_proxy: "http://127.0.0.1:7890"  # HTTP代理地址
+  https_proxy: "https://127.0.0.1:7890"  # HTTPS代理地址
+  no_proxy: "localhost,127.0.0.1"  # 不使用代理的地址列表
+
+# 夜间休眠配置
+night_sleep:
+  switch: "ON"  # 设置开关为 "ON" 开启夜间休眠，设置为其他值则关闭
+
+# 生成日报配置
+daily_report:
+  switch: "ON"  # 是否生成日报
+  push_switch: "OFF"  # 日报只存储不推送，固定为OFF

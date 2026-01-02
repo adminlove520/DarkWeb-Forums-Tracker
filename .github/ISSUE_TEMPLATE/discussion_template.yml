@@ -1,0 +1,38 @@
+name: Discussion
+description: Discuss ideas or suggestions for the project
+title: "Discussion: "
+labels: [discussion]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        欢迎参与项目讨论！
+        请详细描述您的想法或建议，以便我们更好地理解和回应。
+
+  - type: textarea
+    id: discussion-content
+    attributes:
+      label: 讨论内容
+      description: 请详细描述您的想法、建议或问题
+      placeholder: 例如：我认为可以添加XX功能，因为XX...
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: 附加信息
+      description: 可以添加任何相关的附加信息，如截图、代码示例等
+      placeholder: 例如：相关截图、代码示例等
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 检查项
+      description: 请确认以下信息
+      options:
+        - label: 我已经搜索过现有Issue和讨论，确保没有重复
+          required: true
+        - label: 我的讨论内容符合项目的主题和范围
+          required: true

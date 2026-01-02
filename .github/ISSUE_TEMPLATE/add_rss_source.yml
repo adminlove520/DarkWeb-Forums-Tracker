@@ -1,0 +1,52 @@
+name: Add RSS Source
+description: Submit a new DarkWeb forum RSS source for data leak monitoring
+title: "Add RSS Source: "
+labels: [add-rss]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请按照以下格式提交DarkWeb论坛的RSS源，系统会自动处理并添加到监控列表。
+        感谢您的贡献！
+
+  - type: input
+    id: website-name
+    attributes:
+      label: 论坛名称
+      description: 请输入DarkWeb论坛的名称
+      placeholder: 例如：Xforums.st
+    validations:
+      required: true
+
+  - type: input
+    id: rss-url
+    attributes:
+      label: RSS URL
+      description: 请输入论坛的RSS订阅地址
+      placeholder: 例如：https://example.com/forums/-/index.rss
+    validations:
+      required: true
+      pattern: ^https?://.*
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 描述（可选）
+      description: 可以添加论坛的描述信息
+      placeholder: 这是一个DarkWeb论坛，发布关于数据泄露、stealer logs等内容
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 确认信息
+      description: 请确认以下信息
+      options:
+        - label: 我已确认该RSS源可以正常访问
+          required: true
+        - label: 我已确认该RSS源内容与DarkWeb论坛或数据泄露相关
+          required: true
+        - label: 我已确认该RSS源内容合法合规
+          required: true
+        - label: 我已确认该RSS源定期更新
+          required: true
