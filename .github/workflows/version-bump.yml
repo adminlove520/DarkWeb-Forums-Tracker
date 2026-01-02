@@ -52,16 +52,33 @@ jobs:
           echo "new_version=$new_version" >> $GITHUB_OUTPUT
 
       - name: Update version in files
+        shell: bash
         run: |
           new_version=${{ steps.bump_version.outputs.new_version }}
           current_date=$(date +'%Y-%m-%d')
           
+          # 使用更安全的方式更新文件，避免引号解析问题
           # 更新主程序中的版本号
-          sed -i "s/__version__ = \"[^"]*\"/__version__ = \"$new_version\"/" DarkWeb-Forums-Tracker.py
+          python -c "
+with open('DarkWeb-Forums-Tracker.py', 'r') as f:
+    content = f.read()
+new_content = content.replace('__version__ = \'V1.0.3b\'', '__version__ = \'$new_version\'')
+with open('DarkWeb-Forums-Tracker.py', 'w') as f:
+    f.write(new_content)
+          "
           
           # 更新README.md中的版本信息
-          sed -i 's/当前版本：\*\*[^*]*\*\*/当前版本：\*\*'"$new_version""\*\*/' README.md
-          sed -i 's/版本创建时间：[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/版本创建时间：'"$current_date"'/' README.md
+          python -c "
+import re
+with open('README.md', 'r', encoding='utf-8') as f:
+    content = f.read()
+# 更新当前版本
+content = re.sub(r'当前版本：\*\*[^*]*\*\*', f'当前版本：\*\*{new_version}\*\*', content)
+# 更新版本创建时间
+content = re.sub(r'版本创建时间：\d{4}-\d{2}-\d{2}', f'版本创建时间：{current_date}', content)
+with open('README.md', 'w', encoding='utf-8') as f:
+    f.write(content)
+          "
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
