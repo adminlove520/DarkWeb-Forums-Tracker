@@ -187,25 +187,10 @@
             border-bottom: none;
         }
         
-        .report-item::before {
-            content: '├─';
-            color: var(--primary-color);
-            margin-right: 12px;
-            font-weight: bold;
-        }
-        
-        .report-item:last-child::before {
-            content: '└─';
-        }
-        
         .report-item:hover {
             background-color: var(--bg-secondary);
             border-color: var(--primary-color);
             transform: translateX(4px);
-        }
-        
-        .report-item:hover::before {
-            color: var(--secondary-color);
         }
         
         .report-link {
@@ -288,24 +273,10 @@
         footer {
             text-align: center;
             margin-top: 64px;
-            padding: 24px 0;
-            color: var(--text-secondary);
+            padding: 24px;
+            color: var(--text-primary);
             font-size: 0.9rem;
-            border-top: 1px solid var(--border-color);
-            background-color: var(--bg-primary);
-            margin: 64px -20px 0 -20px;
-            padding-left: 20px;
-            padding-right: 20px;
             font-family: 'Courier New', monospace;
-        }
-        
-        footer::before {
-            content: '▬';
-            color: var(--primary-color);
-            display: block;
-            margin-bottom: 16px;
-            font-size: 1.2rem;
-            letter-spacing: -1px;
         }
         
         footer p {
@@ -321,8 +292,8 @@
         }
         
         footer a:hover {
-            color: var(--secondary-color);
-            text-shadow: 0 0 8px rgba(0, 224, 255, 0.4);
+            color: var(--primary-dark);
+            text-decoration: underline;
         }
         
         /* 响应式设计 */
