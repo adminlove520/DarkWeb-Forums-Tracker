@@ -6,7 +6,7 @@ import time
 import os
 import argparse
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 import dingtalkchatbot.chatbot as cb
 from jinja2 import Template
 
@@ -1606,9 +1606,11 @@ def main():
                 # 生成日报RSS feed
                 generate_rss_feed(cursor, feed_type="daily")
             
-            # 检查是否需要生成周报（如果是周五）
-            today = datetime.now()
-            if today.weekday() == 4:  # 4表示周五
+            # 检查是否需要生成周报（如果是周五，基于北京时间）
+            # 获取当前UTC时间，转换为北京时间（UTC+8）
+            now_utc = datetime.utcnow()
+            now_bj = now_utc + timedelta(hours=8)
+            if now_bj.weekday() == 4:  # 4表示周五
                 if config.get('weekly_report', {}).get('switch', 'ON') == 'ON':
                     generate_weekly_report(cursor)
                     # 生成周报RSS feed
@@ -1640,9 +1642,11 @@ def main():
                         # 生成日报RSS feed
                         generate_rss_feed(cursor, feed_type="daily")
                     
-                    # 检查是否需要生成周报（如果是周五）
-                    today = datetime.now()
-                    if today.weekday() == 4:  # 4表示周五
+                    # 检查是否需要生成周报（如果是周五，基于北京时间）
+                    # 获取当前UTC时间，转换为北京时间（UTC+8）
+                    now_utc = datetime.utcnow()
+                    now_bj = now_utc + timedelta(hours=8)
+                    if now_bj.weekday() == 4:  # 4表示周五
                         if config.get('weekly_report', {}).get('switch', 'ON') == 'ON':
                             generate_weekly_report(cursor)
                             # 生成周报RSS feed
