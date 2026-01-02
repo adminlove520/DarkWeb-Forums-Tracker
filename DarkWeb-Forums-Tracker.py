@@ -767,7 +767,8 @@ def get_data_statistics(cursor, report_type="daily"):
         statistics['total_count'] = cursor.fetchone()[0]
         
         # 按数据源统计数量（根据标题前缀或链接识别数据源）
-        cursor.execute("SELECT title, COUNT(*) as count FROM items WHERE date(timestamp) = date('now') GROUP BY SUBSTRING_INDEX(title, ' ', 1) ORDER BY count DESC")
+        # 使用SQLite兼容的方式获取标题前缀，SUBSTRING_INDEX是MySQL函数，SQLite不支持
+        cursor.execute("SELECT title, COUNT(*) as count FROM items WHERE date(timestamp) = date('now') GROUP BY SUBSTR(title, 1, INSTR(title || ' ', ' ') - 1) ORDER BY count DESC")
         statistics['by_source'] = cursor.fetchall()
         
         # 按小时统计数量
@@ -780,7 +781,8 @@ def get_data_statistics(cursor, report_type="daily"):
         statistics['total_count'] = cursor.fetchone()[0]
         
         # 按数据源统计数量
-        cursor.execute("SELECT SUBSTRING_INDEX(title, ' ', 1) as source, COUNT(*) as count FROM items WHERE timestamp >= date('now', 'start of week', '+1 day') AND timestamp <= date('now', 'start of week', '+7 days') GROUP BY source ORDER BY count DESC")
+        # 使用SQLite兼容的方式获取标题前缀，SUBSTRING_INDEX是MySQL函数，SQLite不支持
+        cursor.execute("SELECT SUBSTR(title, 1, INSTR(title || ' ', ' ') - 1) as source, COUNT(*) as count FROM items WHERE timestamp >= date('now', 'start of week', '+1 day') AND timestamp <= date('now', 'start of week', '+7 days') GROUP BY source ORDER BY count DESC")
         statistics['by_source'] = cursor.fetchall()
         
         # 按日期统计数量
