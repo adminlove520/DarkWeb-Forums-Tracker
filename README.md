@@ -4,9 +4,9 @@
 
 ## 版本信息
 
-当前版本：**V1.0.8b**
+当前版本：**V1.0.9b**
 
-版本创建时间：2026-01-04
+版本创建时间：2026-01-05
 
 ## 功能特点
 
@@ -222,7 +222,33 @@ python DarkWeb-Forums-Tracker.py --once
 python DarkWeb-Forums-Tracker.py
 ```
 
-### 2. GitHub Action
+### 2. Docker / Zeabur 部署 (推荐)
+
+代码推送到 `main` 分支后会触发 GitHub Actions 自动构建并打包镜像至 GHCR (`ghcr.io/adminlove520/darkweb-forums-tracker:latest`)。
+
+#### 方式一：Zeabur 部署 (云端)
+1. **创建服务**：在 Zeabur 平台选择 **GitHub** 导入本仓库，或从 **容器镜像** 导入 `ghcr.io/adminlove520/darkweb-forums-tracker:latest`。
+2. **环境变量**：在 Zeabur 服务设置中配置以下环境变量（至少需配置一种推送方式）：
+   - `DISCARD_WEBHOOK`: Discord Webhook 地址
+   - `DISCARD_SWITCH`: `ON`
+   - `TZ`: `Asia/Shanghai`
+3. **数据持久化 (关键)**：
+   - 默认情况下容器重启会导致 `data_leaks.db` 重置。
+   - 在 Zeabur 服务页面点击 **Storage** (或 **Volumes**)。
+   - 点击 **Add Volume**，挂载路径填写 `/app/data_leaks.db`（挂载到文件）。
+   - 重启服务即可。
+
+#### 方式二：Docker 手动运行 (本地/服务器)
+```bash
+docker run -d \
+  --name darkweb-tracker \
+  -e DISCARD_WEBHOOK="你的Webhook" \
+  -e DISCARD_SWITCH="ON" \
+  -v $(pwd)/data_leaks.db:/app/data_leaks.db \
+  ghcr.io/adminlove520/darkweb-forums-tracker:latest
+```
+
+### 3. GitHub Action 部署
 
 项目包含三个GitHub Action工作流：
 
@@ -460,6 +486,11 @@ DarkWeb-Forums-Tracker/
   - 更新GitHub Action工作流，添加周报生成工作流
   - 优化统计功能，只显示指定统计项
   - 完善README文档
+
+- 2026.1.5：
+  - **支持 Zeabur 镜像部署**：提供 Dockerfile 和自动构建工作流。
+  - **持久化改进**：明确了容器化环境下的 SQLite 数据持久化方案。
+  - **文档同步**：同步更新 README 中的部署指南和系统版本。
 
 - 2026.1.3：
   - 改进RSS解析逻辑，支持更多文件类型和链接格式
