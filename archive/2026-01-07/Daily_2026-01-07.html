@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkWeb Forums Tracker Reports 2026-01-07</title>
+    <style>
+        /* 全局样式 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        :root {
+            /* 终端风格配色 */
+            --bg-primary: #0a0e17;
+            --bg-secondary: #121721;
+            --bg-tertiary: #1a1f2e;
+            --bg-gradient: linear-gradient(135deg, #00ff41, #00e0ff);
+            --primary-color: #00ff41;
+            --primary-dark: #00d437;
+            --secondary-color: #00e0ff;
+            --accent-color: #ff007f;
+            --success-color: #00ff41;
+            --warning-color: #ffff00;
+            --danger-color: #ff007f;
+            --text-primary: #00e0ff;
+            --text-secondary: #00e0ff;
+            --text-muted: #6b7280;
+            --border-color: #2d3748;
+            --border-light: #222936;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 255, 65, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 255, 65, 0.15), 0 2px 4px -1px rgba(0, 255, 65, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 255, 65, 0.2), 0 4px 6px -2px rgba(0, 255, 65, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 255, 65, 0.25), 0 10px 10px -5px rgba(0, 255, 65, 0.15);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 255, 65, 0.3);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        body {
+            font-family: 'Courier New', Courier, 'Consolas', 'Monaco', 'Ubuntu Mono', monospace;
+            line-height: 1.7;
+            color: var(--text-primary);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-secondary);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 65, 0.05) 0%, rgba(0, 255, 65, 0.05) 90%),
+                radial-gradient(circle at 90% 80%, rgba(0, 224, 255, 0.05) 0%, rgba(0, 224, 255, 0.05) 90%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        main {
+            flex: 1;
+        }
+        
+        /* 标题样式 */
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-shadow: 0 0 15px rgba(0, 255, 65, 0.7);
+            margin: 0;
+        }
+        
+        /* 头部样式 */
+        header {
+            background: var(--bg-primary);
+            color: var(--primary-color);
+            padding: 48px 32px;
+            border: 2px solid var(--primary-color);
+            text-align: center;
+            margin-bottom: 32px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+            transform: rotate(45deg);
+            animation: float 15s ease-in-out infinite;
+        }
+        
+        header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+            transform: rotate(-45deg);
+            animation: float 12s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: rotate(45deg) translateX(0) translateY(0);
+            }
+            50% {
+                transform: rotate(45deg) translateX(20px) translateY(20px);
+            }
+        }
+        
+        header > * {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .article-count {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 16px;
+            opacity: 0.95;
+            line-height: 1.5;
+        }
+        
+        .update-time {
+            font-size: 1rem;
+            margin-top: 12px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        
+        header:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-2xl);
+        }
+        
+        /* 文章卡片样式 */
+        .article {
+            background-color: var(--bg-primary);
+            padding: 28px;
+            margin-bottom: 24px;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-light);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .article::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--bg-gradient);
+            border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+            transition: transform 0.3s ease;
+        }
+        
+        .article::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: linear-gradient(to right, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+            transition: height 0.3s ease;
+            z-index: 0;
+        }
+        
+        .article:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-4px);
+            border-color: var(--primary-color);
+        }
+        
+        .article:hover::before {
+            transform: scaleY(1.05);
+        }
+        
+        .article:hover::after {
+            height: 100%;
+        }
+        
+        .article > * {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .article-title {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 1.35rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            line-height: 1.5;
+            display: block;
+            margin-bottom: 16px;
+            position: relative;
+            padding-right: 12px;
+        }
+        
+        .article-title::after {
+            content: '🔗';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            font-size: 0.8em;
+        }
+        
+        .article-title:hover {
+            color: var(--primary-color);
+            text-decoration: none;
+            transform: translateX(4px);
+        }
+        
+        .article-title:hover::after {
+            opacity: 1;
+            transform: translateY(-50%) translateX(4px);
+        }
+        
+        .article-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .article-time,
+        .article-source,
+        .article-category {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        /* 移除发布时间和来源前面的绿点 */
+        
+        .article:hover .article-time,
+        .article:hover .article-source,
+        .article:hover .article-category {
+            color: var(--primary-color);
+        }
+        
+        
+        
+        /* 调整文章元信息的顺序 */
+        .article-time {
+            order: 1;
+        }
+        
+        .article-source {
+            order: 2;
+        }
+        
+        .article-category {
+            order: 3;
+        }
+        
+        /* 页脚样式 */
+        footer {
+            text-align: center;
+            margin-top: 64px;
+            padding: 24px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        
+        footer p {
+            margin: 0;
+            line-height: 1.6;
+        }
+        
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease, text-decoration 0.3s ease;
+            font-weight: 500;
+        }
+        
+        footer a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            
+            h1 {
+                font-size: 1.75rem;
+            }
+            
+            header {
+                padding: 32px 24px;
+                margin-bottom: 24px;
+            }
+            
+            header p {
+                font-size: 1.1rem;
+            }
+            
+            .statistics {
+                padding: 24px;
+            }
+            
+            .statistics h2 {
+                font-size: 1.5rem;
+            }
+            
+            .statistics-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .statistics-section {
+                padding: 20px;
+            }
+            
+            .statistics-section h3 {
+                font-size: 1.15rem;
+            }
+            
+            .statistics-grid {
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+                gap: 12px;
+            }
+            
+            .statistics-item {
+                padding: 16px 12px;
+            }
+            
+            .statistics-value {
+                font-size: 1.5rem;
+            }
+            
+            .article {
+                padding: 24px;
+                margin-bottom: 20px;
+            }
+            
+            .article-title {
+                font-size: 1.25rem;
+            }
+            
+            .article-meta {
+                gap: 16px;
+                padding-top: 12px;
+            }
+            
+            .article-time,
+            .article-source,
+            .article-category {
+                font-size: 0.85rem;
+                gap: 6px;
+            }
+            
+            footer {
+                margin: 48px 0 0 0;
+                padding: 24px 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            header {
+                padding: 28px 20px;
+                margin-bottom: 20px;
+            }
+            
+            header p {
+                font-size: 1rem;
+            }
+            
+            .statistics {
+                padding: 20px;
+            }
+            
+            .statistics h2 {
+                font-size: 1.35rem;
+            }
+            
+            .statistics-container {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .statistics-section {
+                padding: 16px;
+            }
+            
+            .statistics-section h3 {
+                font-size: 1.1rem;
+            }
+            
+            .statistics-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 10px;
+            }
+            
+            .statistics-item {
+                padding: 14px 10px;
+            }
+            
+            .statistics-value {
+                font-size: 1.35rem;
+            }
+            
+            .article {
+                padding: 20px;
+                margin-bottom: 16px;
+            }
+            
+            .article-title {
+                font-size: 1.15rem;
+            }
+            
+            .article-meta {
+                gap: 12px;
+                flex-direction: column;
+                align-items: flex-start;
+                padding-top: 10px;
+            }
+            
+            .article-time,
+            .article-source,
+            .article-category {
+                font-size: 0.8rem;
+                gap: 5px;
+            }
+            
+Gne            footer {
+                margin: 40px 0 0 0;
+                padding: 20px 12px;
+            }
+        }
+        
+        /* 统计信息样式 */
+        .statistics {
+            background-color: var(--bg-primary);
+            padding: 32px;
+            margin-bottom: 32px;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .statistics::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--bg-gradient);
+        }
+        
+        .statistics h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .statistics h2::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: var(--border-light);
+        }
+        
+        .statistics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        
+        .statistics-section {
+            background-color: var(--bg-secondary);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .statistics-section:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .statistics-section h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .statistics-section h3::before {
+            content: '';
+            width: 6px;
+            height: 20px;
+            background: var(--bg-gradient);
+            border-radius: 3px;
+        }
+        
+        .statistics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 16px;
+        }
+        
+        .statistics-item {
+            background-color: var(--bg-primary);
+            padding: 20px 16px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .statistics-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--bg-gradient);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        
+        .statistics-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-color);
+        }
+        
+        .statistics-item:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .statistics-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+        
+        .statistics-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+        
+        .statistics-item:hover .statistics-value {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+            border-radius: 6px;
+            border: 3px solid var(--bg-tertiary);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, var(--primary-dark), var(--secondary-color));
+        }
+        
+        /* Firefox滚动条样式 */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--bg-tertiary);
+        }
+        
+        /* 回到顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1000;
+        }
+        
+        .back-to-top:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* 加载动画效果 */
+        .article {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .article:nth-child(1) { animation-delay: 0.1s; }
+        .article:nth-child(2) { animation-delay: 0.2s; }
+        .article:nth-child(3) { animation-delay: 0.3s; }
+        .article:nth-child(4) { animation-delay: 0.4s; }
+        .article:nth-child(5) { animation-delay: 0.5s; }
+        .article:nth-child(6) { animation-delay: 0.6s; }
+        .article:nth-child(7) { animation-delay: 0.7s; }
+        .article:nth-child(8) { animation-delay: 0.8s; }
+        .article:nth-child(9) { animation-delay: 0.9s; }
+        .article:nth-child(10) { animation-delay: 1s; }
+    </style>
+</head>
+<body>
+    <header style="border: 1px solid var(--primary-color); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 32px 24px; text-align: center; margin-bottom: 32px;">
+        <h1 style="color: var(--primary-color); text-shadow: 0 0 15px rgba(0, 255, 65, 0.7); font-size: 2rem; margin-bottom: 16px;">DARKWEB论坛数据泄露监控报告 2026-01-07</h1>
+        <div class="article-count" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); font-size: 1.25rem; margin-bottom: 12px;">📊 共收集到 115 条数据泄露相关信息</div>
+        <div class="update-time" style="color: var(--text-secondary); font-size: 1rem;">🕒 最后更新时间：2026-01-07 02:58:23</div>
+    </header>
+    
+    
+    <section class="statistics" style="border: 1px solid var(--secondary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 224, 255, 0.2); padding: 24px; margin-bottom: 32px; text-align: center; border-radius: 12px;">
+        <h2 style="color: var(--secondary-color); text-shadow: 0 0 10px rgba(0, 224, 255, 0.5); font-size: 1.75rem; margin-bottom: 24px;">统计信息</h2>
+        <div class="statistics-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 24px;">
+            
+            <div class="statistics-section" style="border: 1px solid var(--primary-color); background-color: var(--bg-secondary); padding: 20px; border-radius: 12px; min-width: 320px; box-shadow: 0 0 15px rgba(0, 255, 65, 0.15); flex: 1; min-height: 400px; display: flex; flex-direction: column;">
+                <h3 style="color: var(--warning-color); font-size: 1.25rem; margin-bottom: 16px; text-align: center;">按数据源统计</h3>
+                <div class="statistics-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; flex: 1;">
+                    
+                    <div class="statistics-item" style="border: 1px solid var(--primary-color); background-color: var(--bg-primary); padding: 16px; border-radius: 8px; text-align: center; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); display: flex; flex-direction: column; justify-content: center; min-height: 80px;">
+                        <div class="statistics-label" style="color: var(--text-secondary); font-weight: bold; font-size: 0.9rem;">gerki</div>
+                        <div class="statistics-value" style="color: var(--success-color); font-size: 1.8rem; text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);">28</div>
+                    </div>
+                    
+                    <div class="statistics-item" style="border: 1px solid var(--primary-color); background-color: var(--bg-primary); padding: 16px; border-radius: 8px; text-align: center; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); display: flex; flex-direction: column; justify-content: center; min-height: 80px;">
+                        <div class="statistics-label" style="color: var(--text-secondary); font-weight: bold; font-size: 0.9rem;">Xforums.st</div>
+                        <div class="statistics-value" style="color: var(--success-color); font-size: 1.8rem; text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);">20</div>
+                    </div>
+                    
+                    <div class="statistics-item" style="border: 1px solid var(--primary-color); background-color: var(--bg-primary); padding: 16px; border-radius: 8px; text-align: center; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); display: flex; flex-direction: column; justify-content: center; min-height: 80px;">
+                        <div class="statistics-label" style="color: var(--text-secondary); font-weight: bold; font-size: 0.9rem;">cardforum</div>
+                        <div class="statistics-value" style="color: var(--success-color); font-size: 1.8rem; text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);">18</div>
+                    </div>
+                    
+                    <div class="statistics-item" style="border: 1px solid var(--primary-color); background-color: var(--bg-primary); padding: 16px; border-radius: 8px; text-align: center; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); display: flex; flex-direction: column; justify-content: center; min-height: 80px;">
+                        <div class="statistics-label" style="color: var(--text-secondary); font-weight: bold; font-size: 0.9rem;">hard-tm</div>
+                        <div class="statistics-value" style="color: var(--success-color); font-size: 1.8rem; text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);">15</div>
+                    </div>
+                    
+                    <div class="statistics-item" style="border: 1px solid var(--primary-color); background-color: var(--bg-primary); padding: 16px; border-radius: 8px; text-align: center; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); display: flex; flex-direction: column; justify-content: center; min-height: 80px;">
+                        <div class="statistics-label" style="color: var(--text-secondary); font-weight: bold; font-size: 0.9rem;">dublikat</div>
+                        <div class="statistics-value" style="color: var(--success-color); font-size: 1.8rem; text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);">14</div>
+                    </div>
+                    
+                    <div class="statistics-item" style="border: 1px solid var(--primary-color); background-color: var(--bg-primary); padding: 16px; border-radius: 8px; text-align: center; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); display: flex; flex-direction: column; justify-content: center; min-height: 80px;">
+                        <div class="statistics-label" style="color: var(--text-secondary); font-weight: bold; font-size: 0.9rem;">ipbmafia</div>
+                        <div class="statistics-value" style="color: var(--success-color); font-size: 1.8rem; text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);">12</div>
+                    </div>
+                    
+                    <div class="statistics-item" style="border: 1px solid var(--primary-color); background-color: var(--bg-primary); padding: 16px; border-radius: 8px; text-align: center; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); display: flex; flex-direction: column; justify-content: center; min-height: 80px;">
+                        <div class="statistics-label" style="color: var(--text-secondary); font-weight: bold; font-size: 0.9rem;">mipped</div>
+                        <div class="statistics-value" style="color: var(--success-color); font-size: 1.8rem; text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);">8</div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            
+            
+            <div class="statistics-section" style="border: 1px solid var(--primary-color); background-color: var(--bg-secondary); padding: 20px; border-radius: 12px; min-width: 320px; box-shadow: 0 0 15px rgba(0, 255, 65, 0.15); flex: 1; min-height: 400px; display: flex; flex-direction: column;">
+                <h3 style="color: var(--warning-color); font-size: 1.25rem; margin-bottom: 16px; text-align: center;">按小时统计</h3>
+                <div class="statistics-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; flex: 1;">
+                    
+                    <div class="statistics-item" style="border: 1px solid var(--primary-color); background-color: var(--bg-primary); padding: 16px; border-radius: 8px; text-align: center; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); display: flex; flex-direction: column; justify-content: center; min-height: 80px;">
+                        <div class="statistics-label" style="color: var(--text-secondary); font-weight: bold; font-size: 0.9rem;">02:00</div>
+                        <div class="statistics-value" style="color: var(--success-color); font-size: 1.8rem; text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);">115</div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            
+            
+        </div>
+    </section>
+    
+    
+    <main>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://ipbmafia.ru/topic/34775-glavnaya-ne-indeksiruetsya-v-gugle/?&do=findComment&comment=228557" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Главная не индексируется в гугле</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:23</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：ipbmafia <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://ipbmafia.ru/topic/34775-glavnaya-ne-indeksiruetsya-v-gugle/?&do=findComment&comment=228546" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Главная не индексируется в гугле</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:23</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：ipbmafia <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://ipbmafia.ru/topic/32605-nulled-na-licenziyu/?&do=findComment&comment=228545" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Nulled на лицензию</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:23</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：ipbmafia <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://ipbmafia.ru/topic/34775-glavnaya-ne-indeksiruetsya-v-gugle/?&do=findComment&comment=228544" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Главная не индексируется в гугле</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:23</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：ipbmafia <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://ipbmafia.ru/topic/32605-nulled-na-licenziyu/?&do=findComment&comment=228543" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Nulled на лицензию</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:23</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：ipbmafia <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://ipbmafia.ru/topic/34775-glavnaya-ne-indeksiruetsya-v-gugle/?&do=findComment&comment=228542" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Главная не индексируется в гугле</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:23</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：ipbmafia <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://ipbmafia.ru/topic/32605-nulled-na-licenziyu/?&do=findComment&comment=228541" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Nulled на лицензию</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:23</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：ipbmafia <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://ipbmafia.ru/topic/32605-nulled-na-licenziyu/?&do=findComment&comment=228540" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Nulled на лицензию</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:23</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：ipbmafia <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://ipbmafia.ru/topic/32605-nulled-na-licenziyu/?&do=findComment&comment=228539" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Nulled на лицензию</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:23</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：ipbmafia <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://ipbmafia.ru/topic/34775-glavnaya-ne-indeksiruetsya-v-gugle/?&do=findComment&comment=228538" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Главная не индексируется в гугле</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:23</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：ipbmafia <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://ipbmafia.ru/topic/32605-nulled-na-licenziyu/?&do=findComment&comment=228537" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Nulled на лицензию</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:23</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：ipbmafia <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://ipbmafia.ru/topic/32605-nulled-na-licenziyu/?&do=findComment&comment=228536" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Nulled на лицензию</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:23</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：ipbmafia <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12081" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">NanaKit Premium -- NanaKit Premium</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12080" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">SMS.PRO - platform for selling your numbers</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12079" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Вие сте на правилното място за вашата регистрирана шофьорска книжка и книжка за управ</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12078" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Вие сте на правилното място за вашата регистрирана шофьорска книжка и книжка за управ</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12077" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Вие сте на правилното място за вашата регистрирана шофьорска книжка и книжка за управ</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12076" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Вие сте на правилното място за вашата регистрирана шофьорска книжка и книжка за управ</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12075" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Holen Sie sich schnell die Erlaubnis, die Kategorie B zu leiten, und beginnen Sie mit</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12074" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Holen Sie sich schnell die Erlaubnis, die Kategorie B zu leiten, und beginnen Sie mit</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12073" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Holen Sie sich schnell die Erlaubnis, die Kategorie B zu leiten, und beginnen Sie mit</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12072" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Holen Sie sich schnell die Erlaubnis, die Kategorie B zu leiten, und beginnen Sie mit</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12071" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Holen Sie sich schnell die Erlaubnis, die Kategorie B zu leiten, und beginnen Sie mit</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12070" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Holen Sie sich schnell die Erlaubnis, die Kategorie B zu leiten, und beginnen Sie mit</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12069" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Holen Sie sich schnell die Erlaubnis, die Kategorie B zu leiten, und beginnen Sie mit</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12068" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Holen Sie sich schnell die Erlaubnis, die Kategorie B zu leiten, und beginnen Sie mit</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12067" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Holen Sie sich schnell die Erlaubnis, die Kategorie B zu leiten, und beginnen Sie mit</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12066" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Holen Sie sich schnell die Erlaubnis, die Kategorie B zu leiten, und beginnen Sie mit</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12065" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">[922 S5 Proxy]⚡ Only $0.03/IP⚡  200M+ IPs ⚡ <0.5s Speed</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://cardforum.cc/showthread.php?tid=12064" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">FashionNova Checker Multi-threaded High CPM Clean UI</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:22</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：cardforum <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://at.dublikat.club/threads/vzlom-pochtovyx-jaschikov-i-socialnyx-setej-na-zakaz-ot-3990r.121208/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Взлом почтовых ящиков и социальных сетей на заказ от 3990р.!</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:17</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：dublikat <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://at.dublikat.club/threads/telegram-bot-smsve2_bot-priem-sms-usa-uk-nl-ar-de-ot-0-3-i-arenda-usa-30-365-dnej.186158/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Телеграм бот: @smsve2_bot - Прием SMS[USA,UK,NL,AR,DE][от 0.3$] и Аренда[USA][30/365 дней]</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:17</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：dublikat <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://at.dublikat.club/threads/prodazha-i-razrabotka-onlajn-kazino.158805/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Продажа и разработка онлайн казино</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:17</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：dublikat <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://at.dublikat.club/threads/rabota-xabarovskij-kraj.202192/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Работа. Хабаровский край.</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:17</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：dublikat <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://at.dublikat.club/threads/ischu-obuchenie-po-pereproshivke-ehlektro-schetchikov-na-opore.202191/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Ищу обучение по перепрошивке электро счетчиков на опоре.</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:17</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：dublikat <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://at.dublikat.club/threads/sozdanie-sajtov-ot-str1ke-bystro-i-nedorogo-fish-reverse-proxy-lending-kopija-sajta-platjozhka-ss-kurerka-i-dr.180397/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Создание сайтов от str1ke, быстро и недорого | Фиш, Reverse-Proxy, Лендинг, Копия сайта, Платёжка СС, Курьерка и др.</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:17</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：dublikat <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://at.dublikat.club/threads/live-verifikacija-s-zhivymi-dropami-projdjom-verifikaciju-v-ljubyx-servisax.195384/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Live верификация с живыми дропами! Пройдём верификацию в любых сервисах!</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:17</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：dublikat <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://at.dublikat.club/threads/srochno-v-poiske-raboty.201866/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Срочно в поиске работы</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:17</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：dublikat <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://at.dublikat.club/threads/birzhi-banki-kripto-karty-virtualnye-karty-sng-evropa-binance-bunq-stripe-icard-paysera-bitpay-wise-i-drugie.180136/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Биржи, Банки, Крипто Карты, Виртуальные карты [СНГ, Европа] Binance, BUNQ, Stripe, iCard, Paysera, BitPay, Wise и другие</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:17</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：dublikat <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://at.dublikat.club/threads/cdek-id-sdehk-pochta-rossii-pehp-oformlenie-akkauntov-dlja-anonimnogo-poluchenija-i-otpravki-posylok.199160/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">CDEK ID (СДЭК) / Почта России (ПЭП) - Оформление аккаунтов для анонимного получения и отправки посылок</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:17</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：dublikat <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://at.dublikat.club/threads/jumoney-identifikacija-jumani-gotovye-koshelki-ozon-bank-mts-bank.180135/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">ЮMoney | Идентификация Юмани, Готовые Кошельки, Ozon Банк, МТС Банк</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:17</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：dublikat <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://at.dublikat.club/threads/westsquad-ddos-service.201763/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">WestSquad | DDoS service</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:17</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：dublikat <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://at.dublikat.club/threads/otrisovka-dokumentov-ljuboj-slozhnosti-ot-bullfrog-service.179820/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Отрисовка Документов Любой Сложности от BullFrog Service</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:17</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：dublikat <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://at.dublikat.club/threads/ai-zarabotok-bez-vlozhenij-gotovyj-soft-dlja-raboty.202187/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">AI-Заработок БЕЗ вложений. Готовый софт для работы!</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:17</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：dublikat <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://mipped.com/f/threads/samokat-500-501-95r.319830/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Самокат 500/501 95р</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:15</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：mipped <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://mipped.com/f/threads/akkaunt-igry-star-wars-battlefront-ii-2017-ea-app-origin-deshevo.318697/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Аккаунт игры - Star Wars: Battlefront II (2017) (EA App/Origin) - Дёшево!</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:15</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：mipped <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://mipped.com/f/threads/obshchaya-tema-po-sigaretam.103055/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Общая тема по сигаретам</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:15</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：mipped <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://mipped.com/f/threads/legkiye-50-rublei-aktual-no.168975/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Легкие 50 рублей [ АКТУАЛЬНО ]</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:15</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：mipped <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://mipped.com/f/threads/kuper-promkod-na-70-800-ot-1150.319828/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Купер промкод на 70% (800 от 1150)</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:15</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：mipped <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://mipped.com/f/threads/skupayu-staryye-chaty-gruppy-telegram-tg-30.319773/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Скупаю старые чаты / группы телеграм TG - 30$</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:15</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：mipped <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://mipped.com/f/threads/cursor-35usd.319827/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">cursor 35usd</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:15</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：mipped <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://mipped.com/f/threads/ot-4-chromax-dizain-mechty-animatsii-bannery-web-3d-logotipy-i-procheye.309231/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">[От 4$] CHROMAX - Дизайн мечты | Анимации | Баннеры | WEB | 3D | Логотипы | И прочее</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:15</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：mipped <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138895/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">138.937 Lines ✅ Combolist Fresh Leaks 2025</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138894/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">[178.570] ⭐️ Lines Good For SMTP Corp Leaks Domain</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138893/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">2.771.752 Lines ✅ Mixed Domain, Mixed Country</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138892/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">OFFICE 365 COMBO MAIL PASS</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138890/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">[163.879] ⭐️ Lines Corp Domain UHQ Leaks</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138889/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">151.516 Lines ✅ Business, Corp Fresh Leaks</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138888/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">♋ 70k HOTMAIL DOMAIN WITH VALID 07.01.26 ♋</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138887/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">♋ 120k MIX DOMAIN WITH VALID 07.01.26 ♋</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138886/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">1K Hotmail Just Hits By MegaCloud 06.01</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138885/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">18k Full Valid Mail Access Mi By MegaCloud 06.01</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138884/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">icloud combo list mail pass</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138883/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">4.5K Usa EU Asia RU Fresh Mail Access By MegaCloud 06.01</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138882/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Дешевые дроны стали дорогой проблемой. Израиль придумал, как ловить беспилотники в сети</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138881/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">142.854 Lines ✅ Combolist Fresh Leaks 2025</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138880/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">4.1K Germany Full Valid Mail Access By MegaCloud 06.01</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138879/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">2K Full Valid JAPAN Mail Access By MegaCloud 06.01</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138878/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">games shop reddir form btc tinder bay casino btc psn games porn etc combo</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/138877/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">[178.693] ⭐️ Lines Business Domain Corp Leaks</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/122401/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Множество схем по заработку</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/137159/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Анонимность при работе с гос услуг</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/59653/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Продам базы данных</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/63924/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Меркантилизм - Разработка ботов и софта</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/127283/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">• FREEMAN • Сбор Досье на Физических и юридических лиц</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/126259/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Web-разработка, скрипты, чекеры, парсеры, landing, копии, тг-боты, vpn</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/10497/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Обновленная схема! Продолжаем поднимать 1500р в день на полном пассиве, подробный гайд!</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/109264/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">.:MAESTRO:. [ПОИСК ЛЮДЕЙ ПО ФОТО]Камеры города | Биометрия | Система распознавания лиц</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/92728/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Банковский пробив физических и юридических лиц</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://forum.gerki.ws/threads/95952/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">BAZA.WS - Ваш надежный каталог теневых площадок</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：gerki <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/139054/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">138.937 Lines ✅ Combolist Fresh Leaks 2025</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/12196/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Слив Fetching Butterflies с Onlyfans</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/139053/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">[117.153 lines] t-online.de domain target</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/51353/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">16 папок 18-40 лет №2</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/765/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Слив фото и видео Ahrinyan</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/62501/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Слив Crystalkitty.neko с Onlyfans</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/1275/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Слив Ляля Барбикова (marihantza / lala.angel) с Onlyfans</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/139050/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">[178.570] ⭐️ Lines Good For SMTP Corp Leaks Domain</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/60933/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Слив ivanochka_3 с Fansly</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/30264/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">🔥 Sugar Elite [AIM, ESP, MISC] 130 ФУНКЦИЙ + Hwid Spoofer 🔥 Rage чит для Escape from Tarkov</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/92704/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Python | Remove domains eMail</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/9156/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Уведомления с форума прямо в Telegram</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/127810/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Активность на форуме или же качество контента</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/137835/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Становление белым хакером</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://hard-tm.su/threads/139046/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Мобильное приложение</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:13</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：hard-tm <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/bbva-mexico-bank.221/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">Bbva Mexico Bank</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/rdp-and-rats-tools-pack-by-evilzone.16425/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">RDP and RATs Tools Pack by EVILZONE</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/getfounddigitally-com-au-admin-wp-login.464522/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">getfounddigitally.com.au - Admin WP Login 🔐 🌐</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/www-appnutrition-net-admin-wp-login.465362/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">www.appnutrition.net - Admin WP Login 🔐 🌐</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/1x-petibon-smtp.465373/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">1x PETIBON SMTP 📧 📬</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/ltc-all-balance-base-4238396-lines-leaked.1219/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">LTC all balance base 4238396 lines Leaked</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/48-000-cryptoforex-canada-opt-in-data.15295/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">48.000 CryptoForex Canada Opt-In Data</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/1x-awjinternationalcorp-smtp.464581/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">1x AWJINTERNATIONALCORP SMTP 📧 📬</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/crypto_buorgeois-pionex.15290/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">CRYPTO_BUORGEOIS (pionex)</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/doge-all-balance-base-6321170-lines-leaked.1216/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">DOGE all balance base 6321170 lines Leaked</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/sui-base-7465708-lines-leaked.1222/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">SUI base 7465708 lines Leaked</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/br-wordpress-com-admin-wp-login.465338/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">br.wordpress.com - Admin WP Login 🔐 🌐</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/vps-jobonyachts-com-cpanel-login.462559/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">vps.jobonyachts.com Cpanel Login</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/vmi1867289-contaboserver-net-cpanel-login.457624/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">vmi1867289.contaboserver.net Cpanel Login</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/vlivedesign-com-admin-wp-login.462321/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">vlivedesign.com - Admin WP Login 🔐 🌐</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/vijayaschool-com-admin-wp-login.457359/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">vijayaschool.com - Admin WP Login 🔐 🌐</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/videobiz-tech-info-admin-wp-login.456667/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">videobiz-tech.info - Admin WP Login 🔐 🌐</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/veracruzmunicipio-gob-mx-admin-wp-login.457714/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">veracruzmunicipio.gob.mx - Admin WP Login 🔐 🌐</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/ventas-smartcol-admin-wp-login.462900/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">ventas.smartcol - Admin WP Login 🔐 🌐</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+        <div class="article" style="border: 1px solid var(--primary-color); background-color: var(--bg-tertiary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); padding: 20px; margin-bottom: 24px; border-radius: 12px; transition: all 0.3s ease;">
+            <a href="https://xforums.st/threads/veive-lunarmania-com-cpanel-login.462331/" class="article-title" target="_blank" style="color: var(--secondary-color); font-weight: bold; text-shadow: 0 0 8px rgba(0, 224, 255, 0.4); display: block; margin-bottom: 16px; text-align: center; font-size: 1.1rem; transition: all 0.3s ease;">veive.lunarmania.com Cpanel Login</a>
+            <div class="article-meta" style="color: var(--text-secondary); display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                <div class="article-time" style="color: var(--warning-color); font-size: 0.9rem; display: flex; align-items: center;">发布时间：2026-01-07 02:58:12</div>
+                <div class="article-source" style="color: var(--success-color); font-size: 0.9rem; display: flex; align-items: center;">来源：Xforums.st <span style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-left: 6px; box-shadow: 0 0 8px var(--success-color);"></span></div>
+                
+            </div>
+        </div>
+        
+    </main>
+    
+    <footer>
+        <p>Power By 东方隐侠安全团队 Anonymous@ <a href="https://www.dfyxsec.com/" target="_blank" style="color: var(--primary-color); text-decoration: none;">隐侠安全客栈</a></p>
+    </footer>
+</body>
+</html>
